@@ -1,0 +1,8 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {overlaps,conflicts,validateWindow,expandWeekly} from './rules.mjs';
+test('adjacent half-open intervals are not overlapping',()=>{assert.equal(overlaps('09:00','10:00','10:00','11:00'),false);assert.equal(overlaps('09:00','10:01','10:00','11:00'),true)});
+test('rooms and dates are independent',()=>{const b=[{id:'1',roomId:'a',date:'2026-10-26',start:'09:00',end:'10:00',status:'confirmed'}];assert.equal(conflicts(b,{roomId:'b',date:'2026-10-26',start:'09:00',end:'10:00'}).length,0);assert.equal(conflicts(b,{roomId:'a',date:'2026-10-27',start:'09:00',end:'10:00'}).length,0)});
+test('pending holds block, cancelled does not',()=>{const b=[{id:'1',roomId:'a',date:'2026-10-26',start:'10:00',end:'11:00',status:'pending'},{id:'2',roomId:'a',date:'2026-10-26',start:'12:00',end:'13:00',status:'cancelled'}];assert.equal(conflicts(b,{roomId:'a',date:'2026-10-26',start:'10:30',end:'11:30'}).length,1);assert.equal(conflicts(b,{roomId:'a',date:'2026-10-26',start:'12:00',end:'13:00'}).length,0)});
+test('edits ignore own reservation id',()=>{const b=[{id:'1',roomId:'a',date:'2026-10-26',start:'10:00',end:'11:00',status:'confirmed'}];assert.equal(conflicts(b,{roomId:'a',date:'2026-10-26',start:'10:00',end:'11:00',excludeId:'1'}).length,0)});
+test('invalid windows rejected',()=>{assert.throws(()=>validateWindow('11:00','10:00'));assert.throws(()=>validateWindow('25:00','26:00'));assert.throws(()=>validateWindow('09:00','09:00'))});
+test('weekly recurrence stable across DST',()=>{assert.deepEqual(expandWeekly({firstDate:'2026-10-23',weeks:4,weekday:1}),['2026-10-26','2026-11-02','2026-11-09','2026-11-16'])});

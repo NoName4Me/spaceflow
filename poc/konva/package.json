@@ -1,0 +1,9 @@
+{
+  "name": "spaceflow-konva-spike",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {"dev": "vite --host 127.0.0.1", "build": "tsc --noEmit && vite build"},
+  "dependencies": {"konva": "^10.0.0", "react": "^19.3.0", "react-dom": "^19.3.0", "react-konva": "^19.3.2"},
+  "devDependencies": {"@types/react":"^19.0.0", "@types/react-dom":"^19.0.0", "typescript":"^5.8.3", "vite":"^7.1.0"}
+}
