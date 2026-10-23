@@ -32,7 +32,9 @@
 ```bash
 # 零依赖预约规则纯逻辑测试；Node.js >= 20
 node --test poc/booking/rules.test.mjs
+node scripts/smoke.mjs
 
+# 原型运行检查：六个页面渲染与冲突模型冒烟检查
 # 原型：直接打开 prototype/index.html
 # 可选：使用任意静态服务器托管 prototype 目录
 python3 -m http.server 8080 --directory prototype
