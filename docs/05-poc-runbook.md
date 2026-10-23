@@ -7,6 +7,7 @@
 | 实验 | 命令 / 证据 | 结果 |
 |---|---|---|
 | Node.js 规则单元测试 | `node --test poc/booking/rules.test.mjs` | **通过：6 / 6** |
+| 原型页面运行冒烟测试 | `node scripts/smoke.mjs` | **通过：6 个页面渲染与默认占用冲突检查** |
 | JavaScript 源码语法检查 | `node --check prototype/app.js` | **通过** |
 | React Konva npm 包可获取性 | `npm view react-konva version --fetch-timeout=5000 --fetch-retries=0` | **环境限制：EAI_AGAIN，未验证安装** |
 | React Big Schedule npm 包可获取性 | `npm view react-big-schedule version --fetch-timeout=5000 --fetch-retries=0` | **环境限制：EAI_AGAIN，未验证安装** |
