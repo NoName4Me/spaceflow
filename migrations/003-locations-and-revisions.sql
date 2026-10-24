@@ -1,0 +1,11 @@
+CREATE TABLE buildings(id uuid PRIMARY KEY,name text UNIQUE NOT NULL,sort_order integer NOT NULL DEFAULT 0);
+CREATE TABLE floors(id uuid PRIMARY KEY,building_id uuid NOT NULL REFERENCES buildings(id),name text NOT NULL,sort_order integer NOT NULL DEFAULT 0,UNIQUE(building_id,name));
+ALTER TABLE rooms ADD COLUMN floor_id uuid REFERENCES floors(id);
+INSERT INTO buildings(id,name) SELECT gen_random_uuid(),data->>'building' FROM rooms WHERE data ? 'building' GROUP BY data->>'building';
+INSERT INTO floors(id,building_id,name) SELECT gen_random_uuid(),b.id,r.data->>'floor' FROM rooms r JOIN buildings b ON b.name=r.data->>'building' WHERE r.data ? 'floor' GROUP BY b.id,r.data->>'floor';
+UPDATE rooms r SET floor_id=f.id FROM floors f JOIN buildings b ON b.id=f.building_id WHERE r.data->>'building'=b.name AND r.data->>'floor'=f.name;
+ALTER TABLE bookings ADD COLUMN revision integer NOT NULL DEFAULT 1;
+ALTER TABLE reservation_series ADD COLUMN revision integer NOT NULL DEFAULT 1;
+CREATE TABLE layout_versions(id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,room_id text NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,version integer NOT NULL,layout jsonb NOT NULL,actor uuid REFERENCES users(id),created_at timestamptz NOT NULL DEFAULT now(),UNIQUE(room_id,version));
+INSERT INTO layout_versions(room_id,version,layout) SELECT id,version,layout FROM rooms;
+CREATE TABLE layout_templates(id uuid PRIMARY KEY,name text UNIQUE NOT NULL,layout jsonb NOT NULL,created_by uuid REFERENCES users(id),created_at timestamptz NOT NULL DEFAULT now());

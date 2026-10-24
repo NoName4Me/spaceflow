@@ -1,0 +1,14 @@
+.git
+node_modules
+dist
+.env*
+.local-accounts
+*.log
+backups
+test-results
+playwright-report
+.tls
+poc
+prototype
+tests
+docs

@@ -1,0 +1,40 @@
+{
+  "name": "spaceflow",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch --env-file=.env --import tsx server/index.ts",
+    "start": "node --env-file=.env dist/index.js",
+    "db:migrate": "node --env-file=.env --import tsx server/migrate.ts",
+    "db:seed": "node --env-file=.env --import tsx server/seed.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --env-file=.env --import tsx --test tests/*.test.ts",
+    "test:prototype": "node --test poc/booking/rules.test.mjs && node scripts/smoke.mjs",
+    "test:ui": "node --env-file=.env --import tsx tests/browser.e2e.ts && node --env-file=.env --import tsx tests/admin.e2e.ts && node --env-file=.env --import tsx tests/features.e2e.ts",
+    "setup:local": "node scripts/setup-local.mjs",
+    "build": "tsc -p tsconfig.build.json",
+    "db:backup": "node scripts/backup.mjs",
+    "db:verify-backup": "node scripts/backup.mjs --verify",
+    "deploy:local": "node scripts/deploy-local.mjs",
+    "deploy:https": "node scripts/deploy-local.mjs --https",
+    "verify:setup": "node scripts/verify-setup.mjs"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "nodemailer": "^10.2.1",
+    "pg": "^8.16.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.56.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "@types/nodemailer": "^8.0.2",
+    "@types/pg": "^8.15.0",
+    "prettier": "^3.9.10",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

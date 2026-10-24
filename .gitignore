@@ -6,3 +6,11 @@ dist/
 !.env.example
 .DS_Store
 *.log
+
+.local-accounts
+test-results/
+playwright-report/
+
+backups/
+
+.tls/

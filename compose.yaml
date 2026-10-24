@@ -1,0 +1,44 @@
+name: spaceflow
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    environment:
+      DATABASE_URL: ${CONTAINER_DATABASE_URL:?Run npm run deploy:local}
+      HOST: 0.0.0.0
+      PORT: 3080
+      APP_ORIGIN: ${APP_ORIGIN:-http://127.0.0.1:3080}
+      ADDITIONAL_ORIGINS: ${ADDITIONAL_ORIGINS:-}
+      SMTP_URL: ${CONTAINER_SMTP_URL:-}
+      MAIL_FROM: ${MAIL_FROM:-Spaceflow <spaceflow@localhost>}
+    ports:
+      - '127.0.0.1:3080:3080'
+    networks:
+      - infra
+  https:
+    image: nginxinc/nginx-unprivileged:1.31-alpine
+    user: "${TLS_UID:-101}:${TLS_GID:-101}"
+    profiles: [https]
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./.tls:/etc/nginx/tls:ro
+    ports:
+      - '127.0.0.1:3443:8443'
+    networks:
+      - infra
+networks:
+  infra:
+    external: true
+    name: local-infra
