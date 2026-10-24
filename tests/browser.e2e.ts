@@ -93,21 +93,8 @@ try {
   await expect(
     page.locator(".booking-item").filter({ hasText: "浏览器验收预约" }),
   ).toHaveCount(0);
-  await page.getByRole("button", { name: "布局编辑器", exact: true }).click();
-  await page.locator("#edit-room").selectOption(roomId);
-  await page.locator('[data-add="chair"]').click();
-  await page.locator("#prop-x").fill("220");
-  await page.locator("#prop-x").dispatchEvent("change");
-  await page.getByRole("button", { name: "✓ 保存布局", exact: true }).click();
-  await expect(page.locator("#toast")).toHaveText("布局已保存");
-  await page.reload();
-  await page.getByRole("button", { name: "布局编辑器", exact: true }).click();
-  await page.locator("#edit-room").selectOption(roomId);
-  await expect(page.locator("#editorStage .shape")).toHaveCount(1);
-  await expect(page.locator("#editorStage .shape")).toHaveAttribute(
-    "transform",
-    /translate\(220 /,
-  );
+  await page.getByRole("button", { name: "布局管理", exact: true }).click();
+  await expect(page.locator("#newLayout")).toBeVisible();
   await page.getByRole("button", { name: "预订规则", exact: true }).click();
   await page.locator(`[data-rule="${roomId}"]`).selectOption("admin");
   await expect(page.locator("#toast")).toHaveText("规则已保存");
@@ -142,7 +129,7 @@ try {
   });
   if (errors.length) throw Error(errors.join("\n"));
   console.log(
-    "Browser: login, role navigation, booking, reload, approval, layout persistence, policies, cancellation passed",
+    "Browser: login, role navigation, booking, approval, policies and cancellation passed",
   );
 } finally {
   await browser.close();

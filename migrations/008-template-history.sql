@@ -1,0 +1,2 @@
+CREATE TABLE layout_template_versions(template_id uuid NOT NULL REFERENCES layout_templates(id) ON DELETE CASCADE,version integer NOT NULL,name text NOT NULL,type text NOT NULL,layout jsonb NOT NULL,actor uuid REFERENCES users(id),created_at timestamptz NOT NULL DEFAULT now(),PRIMARY KEY(template_id,version));
+INSERT INTO layout_template_versions(template_id,version,name,type,layout) SELECT id,version,name,type,layout FROM layout_templates;

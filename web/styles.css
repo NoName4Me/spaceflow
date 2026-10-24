@@ -1564,3 +1564,455 @@ small {
 .checkbox-row {
   color: #52665b;
 }
+#crumb {
+  display: inline;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.page-tools {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.results-toolbar,
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  margin: 20px 0 16px;
+}
+.view-switch {
+  display: flex;
+  gap: 4px;
+}
+.view-switch .active {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+.room-card {
+  display: block;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.room-card .room-art,
+.room-card .room-info,
+.room-card .room-meta,
+.room-card .room-layout-type {
+  display: block;
+}
+.room-card .room-topline strong {
+  font-size: 17px;
+}
+.room-card .room-layout-type {
+  font-size: 12px;
+  margin: 10px 0;
+  color: var(--muted);
+}
+.room-card .amenities {
+  margin-bottom: 0;
+}
+.discovery-list {
+  overflow-x: auto;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.discovery-list-head,
+.discovery-list-row {
+  display: grid;
+  grid-template-columns:
+    minmax(230px, 1.5fr) minmax(150px, 1fr)
+    70px 95px minmax(180px, 1.1fr) 95px;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 20px;
+  min-width: 980px;
+}
+.discovery-list-head {
+  font-size: 12px;
+  color: var(--muted);
+  background: #f0f4ef;
+}
+.discovery-list-row {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: white;
+  text-align: left;
+  font: inherit;
+  font-size: 13px;
+  color: inherit;
+}
+.discovery-list-row:last-child {
+  border-bottom: 0;
+}
+.discovery-list-row:hover {
+  background: #f4f8f3;
+}
+.list-room {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.list-room strong,
+.list-room small {
+  display: block;
+}
+.list-room small {
+  margin-top: 6px;
+  color: var(--muted);
+}
+.mini-plan {
+  display: block;
+  width: 95px;
+  height: 62px;
+  border-radius: 5px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #f4f7f1;
+}
+.mini-plan svg {
+  width: 100%;
+  height: 100%;
+}
+.list-facilities {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.room-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.room-status:before {
+  content: "";
+  height: 6px;
+  width: 6px;
+  display: block;
+  border-radius: 50%;
+  background: currentColor;
+}
+.room-status.available {
+  color: #285b49;
+}
+.room-status.occupied {
+  color: #8a4824;
+}
+.room-dialog {
+  width: min(940px, calc(100vw - 40px));
+  max-height: 90vh;
+  overflow: auto;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--ink);
+  box-shadow: 0 24px 80px #17332930;
+}
+.room-dialog::backdrop {
+  background: #10271c70;
+  backdrop-filter: blur(3px);
+}
+.room-dialog-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.room-detail-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 28px;
+}
+.detail-preview {
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f4f7f1;
+  align-self: start;
+}
+.detail-facts {
+  font-size: 13px;
+  display: grid;
+  align-content: start;
+  gap: 18px;
+}
+.detail-facts p {
+  line-height: 1.6;
+  color: var(--muted);
+}
+.fact-line {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+.fact-line strong {
+  font-size: 24px;
+}
+.detail-booking-rule {
+  font-size: 12px;
+  color: var(--muted);
+}
+.detail-agenda {
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+  margin-top: 24px;
+}
+.detail-agenda input {
+  font: inherit;
+  font-size: 13px;
+  padding: 9px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.empty-agenda {
+  padding: 20px 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.managed-rooms {
+  min-width: 0;
+  padding: 0;
+}
+.managed-rooms .table-toolbar {
+  padding: 16px 20px;
+  margin: 0;
+}
+.table-scroll {
+  overflow: auto;
+}
+.room-management-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1050px;
+  font-size: 12px;
+}
+.room-management-table th {
+  background: #f0f4ef;
+  text-align: left;
+  color: var(--muted);
+  font-weight: 500;
+}
+.room-management-table th,
+.room-management-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+.room-management-table .management-row {
+  display: table-row;
+}
+.room-management-table td strong {
+  font-size: 13px;
+}
+.room-management-table td small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+}
+.room-management-table td:first-child,
+.room-management-table th:first-child {
+  padding-left: 20px;
+}
+.room-management-table input[type="checkbox"] {
+  accent-color: var(--green);
+}
+.room-management-table tr:last-child td {
+  border-bottom: 0;
+}
+.bulk-field {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.bulk-field > .checkbox-row {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--ink);
+}
+.bulk-field .field label {
+  display: none;
+}
+.layout-library {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.layout-card {
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.layout-card-main {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: white;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+}
+.layout-card-main svg {
+  display: block;
+  width: 100%;
+  height: 180px;
+  background: #f4f7f1;
+}
+.layout-card-main strong {
+  display: block;
+  padding: 16px 18px 6px;
+  font-size: 16px;
+}
+.layout-card-footer {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 18px 16px;
+}
+.layout-card-footer small {
+  margin-right: auto;
+  color: var(--muted);
+}
+.layout-edit-toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.layout-edit-toolbar #managedLayoutName {
+  width: 220px;
+}
+.layout-edit-toolbar select {
+  width: 150px;
+}
+.layout-edit-toolbar #saveManagedLayout {
+  margin-left: auto;
+}
+.editor-side h2 {
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+.editor-side .palette-item {
+  justify-content: space-between;
+}
+.editor-props .mini-fields {
+  row-gap: 14px;
+  margin-bottom: 18px;
+}
+.editor-props .mini-fields label {
+  font-size: 12px;
+}
+.editor-props > .checkbox-row {
+  margin: 20px 0;
+}
+.layout-canvas-panel {
+  min-width: 0;
+  padding: 12px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (max-width: 1100px) {
+  .layout-library {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 650px) {
+  .room-detail-layout {
+    grid-template-columns: 1fr;
+  }
+  .room-dialog {
+    padding: 20px;
+  }
+  .layout-library {
+    grid-template-columns: 1fr;
+  }
+  .page {
+    padding-top: 22px;
+  }
+  .page-tools {
+    justify-content: flex-start;
+  }
+  .layout-edit-toolbar #saveManagedLayout {
+    margin-left: 0;
+  }
+}
+.chip,
+.amenity {
+  color: #40594b;
+}
+.chip.on {
+  color: #214c38;
+}
+.catalog-layout {
+  grid-template-columns: 190px minmax(0, 1fr);
+}
+.room-management-table {
+  min-width: 820px;
+}
+.room-management-table th,
+.room-management-table td {
+  padding: 13px 10px;
+}
+.room-management-table td:nth-child(2) small {
+  max-width: 115px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.room-management-table td:nth-child(4),
+.room-management-table td:nth-child(5) {
+  white-space: nowrap;
+}
+@media (max-width: 850px) {
+  .catalog-layout {
+    grid-template-columns: 1fr;
+  }
+}
+.room-management-table {
+  table-layout: fixed;
+  min-width: 880px;
+}
+.room-management-table th {
+  white-space: nowrap;
+}
+.room-management-table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.room-management-table td:nth-child(7) {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+.room-management-table td:last-child {
+  overflow: visible;
+}
+.layout-card-footer button:disabled {
+  cursor: not-allowed;
+}

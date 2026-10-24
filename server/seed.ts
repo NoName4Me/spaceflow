@@ -1,3 +1,4 @@
+import { resolveTemplate } from "./template-choice.ts";
 import { resolveLocation } from "./locations.ts";
 import { readFile, writeFile } from "node:fs/promises";
 import vm from "node:vm";
@@ -41,11 +42,18 @@ try {
     for (const r of context.seedRooms) {
       if ((await c.query("SELECT id FROM rooms WHERE id=$1", [r.id])).rowCount)
         continue;
+      const template = await resolveTemplate(c, r.type);
       const location = await resolveLocation(c, r),
         layout = JSON.stringify(context.seedLayout(r.type));
       await c.query(
-        "INSERT INTO rooms(id,data,layout,floor_id) VALUES($1,$2,$3,$4)",
-        [r.id, JSON.stringify({ ...r, repeat: false }), layout, location.id],
+        "INSERT INTO rooms(id,data,layout,floor_id,layout_template_id) VALUES($1,$2,$3,$4,$5)",
+        [
+          r.id,
+          JSON.stringify({ ...r, repeat: false }),
+          layout,
+          location.id,
+          template.id,
+        ],
       );
       await c.query(
         "INSERT INTO layout_versions(room_id,version,layout) VALUES($1,1,$2)",

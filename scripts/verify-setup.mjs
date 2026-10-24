@@ -49,12 +49,19 @@ try {
   const {
     rows: [r],
   } = await client.query(
-    "SELECT (SELECT count(*)::int FROM rooms) AS rooms,(SELECT count(*)::int FROM rooms WHERE floor_id IS NOT NULL) AS assigned,(SELECT count(*)::int FROM layout_versions) AS layouts,(SELECT count(*)::int FROM users) AS users",
+    "SELECT (SELECT count(*)::int FROM rooms) AS rooms,(SELECT count(*)::int FROM rooms WHERE floor_id IS NOT NULL) AS assigned,(SELECT count(*)::int FROM rooms WHERE layout_template_id IS NOT NULL) AS assigned_layouts,(SELECT count(*)::int FROM layout_templates) AS templates,(SELECT count(*)::int FROM layout_versions) AS layouts,(SELECT count(*)::int FROM users) AS users",
   );
-  if (r.rooms !== 6 || r.assigned !== 6 || r.layouts !== 6 || r.users !== 2)
+  if (
+    r.rooms !== 6 ||
+    r.assigned !== 6 ||
+    r.assigned_layouts !== 6 ||
+    r.templates < 5 ||
+    r.layouts !== 6 ||
+    r.users !== 2
+  )
     throw Error("Clean initialization integrity failed");
   console.log(
-    "Clean setup verified: 6 rooms assigned to floors, 6 layout versions, 2 accounts",
+    "Clean setup verified: 6 rooms assigned to floors and shared layouts, 5 built-in layouts, 2 accounts",
   );
 } finally {
   await client?.end();

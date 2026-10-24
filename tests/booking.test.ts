@@ -313,7 +313,7 @@ test("layout persists, checks revision, rejects unauthorized and unsafe values",
     400,
   );
   assert.deepEqual(
-    (await request("/state", member)).data.layouts[room],
+    (await request("/state", admin)).data.layouts[room],
     elements,
   );
 });

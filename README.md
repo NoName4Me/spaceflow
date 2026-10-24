@@ -20,11 +20,11 @@ npm run deploy:local
 
 ## 功能
 
-- 楼栋与楼层管理、会议室归属、改名与排序、可见和可订权限。
-- 日期、容量和设备筛选，日/周资源日程、分页和拖拽改期。
+- 楼栋与楼层管理、会议室归属、列表预览、批量编辑、可见和可订权限。
+- 日期、容量和设备筛选；宫格/列表切换、布局缩略图、详情弹窗；日/周日程和拖拽改期。
 - 单次预订、每天/每周/每月周期、指定星期、冲突预览和明确跳过冲突项。
 - 本次或系列后续修改与取消、审批重提、数据库并发防冲突。
-- 内部布局拖动、缩放、旋转、吸附、撤销、导入导出、模板和版本恢复。
+- 布局管理支持新增、复制、编辑屏幕和白板、导入导出与版本恢复；会议室使用所选布局的预览图。
 - 用户与部门管理、账号停用、密码变更、管理员代订、站内通知和操作记录。
 - 可配置 SMTP 邮件通知；当前未提供外发服务器配置，站内通知可直接使用。
 
@@ -47,4 +47,4 @@ npm run db:verify-backup
 
 `server/` 业务模块 · `web/` 应用界面 · `migrations/` 数据迁移 · `tests/` 验收 · `deploy/` 部署配置 · `.github/workflows/` CI。早期 `prototype/` 与 `poc/` 保留。
 
-[本轮交付与验收](docs/08-completion.md) · [产品方案](docs/01-product-design.md) · [架构原则](docs/03-architecture-decisions.md)
+[界面与批量管理调整](docs/09-workspace-refinement.md) · [功能验收](docs/08-completion.md) · [产品方案](docs/01-product-design.md) · [架构原则](docs/03-architecture-decisions.md)

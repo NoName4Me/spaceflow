@@ -14,7 +14,7 @@
           <span class="brand-mark"><i></i><i></i><i></i><i></i></span>
           <div><strong>间序</strong><small>SPACEFLOW</small></div>
         </div>
-        <div class="sidebar-label">WORKSPACE</div>
+        <div class="sidebar-label">预订</div>
         <nav id="mainnav">
           <button data-page="explore" class="nav-item active">
             <span class="nav-icon" aria-hidden="true">◫</span> 空间发现</button
@@ -24,7 +24,7 @@
             <span class="nav-icon" aria-hidden="true">▤</span> 我的预订
           </button>
         </nav>
-        <div class="sidebar-label admin-label admin-only">MANAGEMENT</div>
+        <div class="sidebar-label admin-label admin-only">管理</div>
         <nav class="admin-only">
           <button data-page="rooms" class="nav-item">
             <span class="nav-icon" aria-hidden="true">▣</span> 会议室管理
@@ -42,7 +42,7 @@
             <span class="nav-icon" aria-hidden="true">✓</span> 预订审批</button
           ><button data-page="editor" class="nav-item">
             <span class="nav-icon" aria-hidden="true">⌗</span>
-            布局编辑器</button
+            布局管理</button
           ><button data-page="settings" class="nav-item">
             <span class="nav-icon" aria-hidden="true">⚙</span> 预订规则
           </button>
@@ -59,7 +59,8 @@
       <main class="main">
         <header class="topbar">
           <div class="breadcrumbs">
-            <span>间序 / </span><b id="crumb">空间发现</b>
+            <span>间序 / </span>
+            <h1 id="crumb">空间发现</h1>
           </div>
           <div class="header-right">
             <button
@@ -68,7 +69,6 @@
               id="notificationButton"
             >
               通知</button
-            ><span class="header-date" id="todayText"></span
             ><button class="button small" id="refresh">刷新</button>
           </div>
         </header>
@@ -84,7 +84,6 @@
         >
           <div class="modal-top">
             <div>
-              <small class="eyebrow">NEW RESERVATION</small>
               <h2 id="modalTitle">预订会议室</h2>
             </div>
             <button class="icon-btn" id="closeModal" aria-label="关闭">
@@ -95,8 +94,26 @@
         </div>
       </div>
     </div>
+    <dialog
+      id="roomDialog"
+      class="room-dialog"
+      aria-labelledby="roomDetailTitle"
+    >
+      <div class="room-dialog-heading">
+        <h2 id="roomDetailTitle"></h2>
+        <button
+          class="icon-btn"
+          id="closeRoomDetail"
+          aria-label="关闭会议室详情"
+        >
+          ×
+        </button>
+      </div>
+      <div id="roomDetailBody"></div>
+    </dialog>
     <script src="./management.js"></script>
     <script src="./features.js"></script>
+    <script src="./workspace.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>

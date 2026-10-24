@@ -76,13 +76,19 @@ if (process.argv.includes("--verify")) {
         "-d",
         database,
         "-Atqc",
-        "SELECT json_build_object('migrations',(SELECT count(*) FROM schema_migrations),'rooms',(SELECT count(*) FROM rooms),'exclusion',(SELECT count(*) FROM pg_constraint WHERE conrelid='bookings'::regclass AND contype='x'),'trigger',(SELECT count(*) FROM pg_trigger WHERE tgrelid='bookings'::regclass AND NOT tgisinternal))",
+        "SELECT json_build_object('migrations',(SELECT count(*) FROM schema_migrations),'rooms',(SELECT count(*) FROM rooms),'templates',(SELECT count(*) FROM layout_templates),'assigned',(SELECT count(*) FROM rooms WHERE layout_template_id IS NOT NULL),'exclusion',(SELECT count(*) FROM pg_constraint WHERE conrelid='bookings'::regclass AND contype='x'),'trigger',(SELECT count(*) FROM pg_trigger WHERE tgrelid='bookings'::regclass AND NOT tgisinternal))",
       ]),
     );
-    if (result.migrations < 2 || result.exclusion !== 1 || result.trigger !== 1)
+    if (
+      result.migrations < 8 ||
+      result.templates < 1 ||
+      result.assigned !== result.rooms ||
+      result.exclusion !== 1 ||
+      result.trigger !== 1
+    )
       throw Error("恢复完整性检查失败");
     console.log(
-      `恢复验证通过：${result.migrations} 个迁移、${result.rooms} 间会议室、预订约束和通知触发器完整。`,
+      `恢复验证通过：${result.migrations} 个迁移、${result.rooms} 间会议室、${result.templates} 个共享布局，预订约束和通知触发器完整。`,
     );
   } finally {
     if (created) pg(["dropdb", "-U", "postgres", database]);

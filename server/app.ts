@@ -1,3 +1,4 @@
+import { bulkRooms } from "./bulk-rooms.ts";
 import { calendar } from "./calendar.ts";
 import { layoutSchema, layouts } from "./layouts.ts";
 import { bookingEdits } from "./booking-edits.ts";
@@ -150,6 +151,11 @@ export async function expireBookings() {
 }
 app.get("/api/state", async (req, res) => {
   await expireBookings();
+  const layoutTemplates = (
+    await pool.query(
+      "SELECT id,name,type,layout,version,is_builtin FROM layout_templates ORDER BY is_builtin DESC,name",
+    )
+  ).rows;
   const allRooms = (
     await pool.query("SELECT * FROM rooms ORDER BY data->>'code',id")
   ).rows;
@@ -184,12 +190,34 @@ app.get("/api/state", async (req, res) => {
     user: req.user,
     rooms: rooms.map((r) => ({
       ...r.data,
+      floorId: r.floor_id,
+      layoutTemplateId: r.layout_template_id,
       access: req.user.role === "admin" ? r.data.access : undefined,
       canBook: canBook(r.data, req.user),
       status: r.data.status || "enabled",
       version: r.version,
     })),
-    layouts: Object.fromEntries(rooms.map((r) => [r.id, r.layout])),
+    layoutTemplates:
+      req.user.role === "admin"
+        ? layoutTemplates
+        : layoutTemplates.filter((t) =>
+            rooms.some(
+              (r) =>
+                r.layout_template_id === t.id ||
+                (!r.layout_template_id && r.data.type === t.type),
+            ),
+          ),
+    layouts: Object.fromEntries(
+      rooms.map((r) => [
+        r.id,
+        req.user.role === "admin"
+          ? r.layout
+          : (
+              layoutTemplates.find((t) => t.id === r.layout_template_id) ||
+              layoutTemplates.find((t) => t.type === r.data.type)
+            )?.layout || [],
+      ]),
+    ),
     bookings,
     unread: (
       await pool.query(
@@ -200,6 +228,7 @@ app.get("/api/state", async (req, res) => {
   });
 });
 app.use("/api", management);
+app.use("/api", bulkRooms);
 app.use("/api", (req, res, next) => {
   if (
     req.path.startsWith("/buildings") ||

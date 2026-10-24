@@ -101,74 +101,8 @@ try {
   await accessible();
   await mkdir("test-results", { recursive: true });
   await page.screenshot({ path: "test-results/hierarchy.png" });
-  await nav("布局编辑器");
-  await page.locator("#edit-room").selectOption(roomId);
-  await page.locator('[data-add="table"]').click();
-  await page.getByLabel("宽度", { exact: true }).fill("260");
-  await page.getByLabel("宽度", { exact: true }).dispatchEvent("change");
-  await page.getByLabel("高度", { exact: true }).fill("100");
-  await page.getByLabel("高度", { exact: true }).dispatchEvent("change");
-  await page.getByRole("button", { name: "✓ 保存布局", exact: true }).click();
-  await expect(page.locator("#toast")).toHaveText("布局已保存");
-  await page.getByRole("button", { name: "保存为模板", exact: true }).click();
-  await page.getByLabel("模板名称", { exact: true }).fill("模板-" + tag);
-  await save();
-  templateId = (
-    await pool.query("SELECT id FROM layout_templates WHERE name=$1", [
-      "模板-" + tag,
-    ])
-  ).rows[0].id;
-  const imported = {
-    schemaVersion: 1,
-    coordinateSystem: { width: 600, height: 390 },
-    elements: [
-      {
-        id: "imported-chair",
-        type: "chair",
-        x: 200,
-        y: 160,
-        r: 0,
-        w: 50,
-        h: 50,
-      },
-    ],
-  };
-  await page.locator("#layoutFile").setInputFiles({
-    name: "layout.json",
-    mimeType: "application/json",
-    buffer: Buffer.from(JSON.stringify(imported)),
-  });
-  await expect(page.locator("#editorStage .shape")).toHaveAttribute(
-    "data-id",
-    "imported-chair",
-  );
-  await page.getByRole("button", { name: "✓ 保存布局", exact: true }).click();
-  await expect(page.locator("#toast")).toHaveText("布局已保存");
-  await page.getByLabel("布局历史版本", { exact: true }).selectOption("2");
-  await page.getByRole("button", { name: "载入历史版本", exact: true }).click();
-  await expect(page.locator("#editorStage .shape")).not.toHaveAttribute(
-    "data-id",
-    "imported-chair",
-  );
-  await page.getByRole("button", { name: "✓ 保存布局", exact: true }).click();
-  await expect(page.locator("#toast")).toHaveText("布局已保存");
-  const stored = (
-    await pool.query("SELECT layout FROM rooms WHERE id=$1", [roomId])
-  ).rows[0].layout;
-  expect(stored[0].w).toBe(260);
-  expect(stored[0].h).toBe(100);
-  await page.locator("#layoutFile").setInputFiles({
-    name: "bad.json",
-    mimeType: "application/json",
-    buffer: Buffer.from(
-      JSON.stringify({
-        ...imported,
-        elements: [{ ...imported.elements[0], type: "script" }],
-      }),
-    ),
-  });
-  await expect(page.locator("#toast")).toHaveText("布局元素不正确");
-  await expect(page.locator("#editorStage .shape")).toHaveCount(1);
+  await nav("布局管理");
+  await expect(page.locator("#newLayout")).toBeVisible();
   await accessible();
   await nav("空间发现");
   await page.locator(`[data-room="${roomId}"]`).click();
@@ -223,7 +157,7 @@ try {
   await page.screenshot({ path: "test-results/hierarchy-mobile.png" });
   if (errors.length) throw Error(errors.join("\n"));
   console.log(
-    "Browser evolution: hierarchy, rename, resize/import/history, edit, drag-to-reschedule, keyboard alternatives and WCAG AA scan passed",
+    "Browser: hierarchy, rename, booking edits, drag-to-reschedule and WCAG scans passed",
   );
 } finally {
   await browser.close();

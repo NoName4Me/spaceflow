@@ -1,3 +1,4 @@
+import { resolveTemplate } from "./template-choice.ts";
 import { Router } from "express";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
@@ -198,6 +199,7 @@ const roomSchema = z
   .object({
     name: text,
     code: text,
+    layoutTemplateId: z.uuid().optional(),
     floorId: z.uuid().optional(),
     building: text.optional(),
     floor: text.optional(),
@@ -246,17 +248,23 @@ management.post("/rooms", async (req, res) => {
   await transaction(async (c) => {
     await validateAccess(b.access, c);
     const location = await resolveLocation(c, b);
-    await c.query("INSERT INTO rooms(id,data,floor_id) VALUES($1,$2,$3)", [
-      id,
-      JSON.stringify({
-        ...b,
-        building: location.building,
-        floor: location.floor,
+    const template = await resolveTemplate(c, b.type, b.layoutTemplateId);
+    await c.query(
+      "INSERT INTO rooms(id,data,floor_id,layout_template_id) VALUES($1,$2,$3,$4)",
+      [
         id,
-        color: "#adc7b3",
-      }),
-      location.id,
-    ]);
+        JSON.stringify({
+          ...b,
+          type: template.type,
+          building: location.building,
+          floor: location.floor,
+          id,
+          color: "#adc7b3",
+        }),
+        location.id,
+        template.id,
+      ],
+    );
     await c.query(
       "INSERT INTO layout_versions(room_id,version,layout,actor) VALUES($1,1,'[]',$2)",
       [id, req.user.id],
@@ -273,16 +281,19 @@ management.put("/rooms/:id", async (req, res) => {
   await transaction(async (c) => {
     await validateAccess(b.access, c);
     const location = await resolveLocation(c, b);
+    const template = await resolveTemplate(c, b.type, b.layoutTemplateId);
     const r = await c.query(
-      "UPDATE rooms SET data=data || $1::jsonb,floor_id=$3 WHERE id=$2",
+      "UPDATE rooms SET data=data || $1::jsonb,floor_id=$3,layout_template_id=$4 WHERE id=$2",
       [
         JSON.stringify({
           ...b,
+          type: template.type,
           building: location.building,
           floor: location.floor,
         }),
         req.params.id,
         location.id,
+        template.id,
       ],
     );
     if (!r.rowCount) throw fail(404, "会议室不存在");

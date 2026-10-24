@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "node --env-file=.env --import tsx --test tests/*.test.ts",
     "test:prototype": "node --test poc/booking/rules.test.mjs && node scripts/smoke.mjs",
-    "test:ui": "node --env-file=.env --import tsx tests/browser.e2e.ts && node --env-file=.env --import tsx tests/admin.e2e.ts && node --env-file=.env --import tsx tests/features.e2e.ts",
+    "test:ui": "node --env-file=.env --import tsx tests/browser.e2e.ts && node --env-file=.env --import tsx tests/admin.e2e.ts && node --env-file=.env --import tsx tests/features.e2e.ts && node --env-file=.env --import tsx tests/workspace.e2e.ts",
     "setup:local": "node scripts/setup-local.mjs",
     "build": "tsc -p tsconfig.build.json",
     "db:backup": "node scripts/backup.mjs",

@@ -1,28 +1,3 @@
-function renderLocationRooms() {
-  const catalog = state.catalog || { buildings: [], floors: [] };
-  const selectedRooms = state.rooms.filter(
-    (r) =>
-      (!state.locationBuilding ||
-        catalog.floors.some(
-          (f) => f.id === r.floorId && f.building_id === state.locationBuilding,
-        )) &&
-      (!state.locationFloor || r.floorId === state.locationFloor),
-  );
-  return `<section class="page">${pageHead("SPACES", "会议室管理", `${state.rooms.length} 间会议室`, `<button class="button" id="newBuilding">＋ 楼栋</button><button class="button" id="newFloor" ${!catalog.buildings.length ? "disabled" : ""}>＋ 楼层</button><button class="button primary" id="newRoom" ${!catalog.floors.length ? "disabled" : ""}>＋ 新增会议室</button>`)}<div class="catalog-layout"><aside class="panel location-tree"><button class="tree-item ${!state.locationBuilding ? "selected" : ""}" data-location-all>全部会议室</button>${catalog.buildings
-    .map(
-      (b) =>
-        `<div class="tree-line"><button class="tree-item ${state.locationBuilding === b.id && !state.locationFloor ? "selected" : ""}" data-location-building="${b.id}">${esc(b.name)}</button><button class="icon-btn" data-edit-building="${b.id}" aria-label="编辑${esc(b.name)}">⋯</button></div>${catalog.floors
-          .filter((f) => f.building_id === b.id)
-          .map(
-            (f) =>
-              `<div class="tree-line tree-floor"><button class="tree-item ${state.locationFloor === f.id ? "selected" : ""}" data-location-floor="${f.id}">${esc(f.name)}</button><button class="icon-btn" data-edit-floor="${f.id}" aria-label="编辑${esc(b.name)}${esc(f.name)}">⋯</button></div>`,
-          )
-          .join("")}`,
-    )
-    .join(
-      "",
-    )}</aside><div class="panel management-list">${selectedRooms.map((r) => `<article class="management-row"><div><h3>${esc(r.name)}</h3><p>${esc(r.building)} / ${esc(r.floor)} · ${esc(r.code)} · ${r.capacity} 人</p><small>${{ enabled: "启用", disabled: "停用", hidden: "隐藏", maintenance: "维护" }[r.status]}</small></div><button class="button" data-edit-room="${r.id}">编辑档案与权限</button></article>`).join("") || '<div class="empty-box">该位置暂无会议室</div>'}</div></div></section>`;
-}
 function editLocation(kind, id) {
   const floor = kind === "floors",
     entry = (floor ? state.catalog.floors : state.catalog.buildings).find(
@@ -217,6 +192,7 @@ async function handleFeatureClick(node) {
     const f = state.catalog.floors.find(
       (f) => f.id === node.dataset.locationFloor,
     );
+    state.selectedRooms = [];
     state.locationFloor = f?.id;
     state.locationBuilding = f?.building_id || node.dataset.locationBuilding;
     render();
@@ -258,53 +234,6 @@ async function handleFeatureClick(node) {
   }
   if (node.id === "importLayout") {
     $("#layoutFile").click();
-    return true;
-  }
-  if (node.id === "saveTemplate") {
-    showEditDialog(
-      "保存为模板",
-      uiField("模板名称", "name", "", "text", 'required maxlength="100"'),
-      async (f) => {
-        await api("/layout-templates", {
-          method: "POST",
-          body: JSON.stringify({
-            name: f.get("name"),
-            elements: state.layouts[state.selectedRoom],
-          }),
-        });
-      },
-    );
-    return true;
-  }
-  if (node.id === "applyTemplate") {
-    const template = state.templates.find(
-      (t) => t.id === $("#layoutTemplate").value,
-    );
-    if (template) {
-      saveUndo();
-      state.layouts[state.selectedRoom] = structuredClone(template.layout);
-      render();
-    }
-    return true;
-  }
-  if (node.id === "deleteTemplate") {
-    const id = $("#layoutTemplate").value;
-    if (id) {
-      await api("/layout-templates/" + id, { method: "DELETE" });
-      await loadPageData("editor");
-      render();
-    }
-    return true;
-  }
-  if (node.id === "restoreLayout") {
-    const v = $("#layoutVersion").value;
-    if (v) {
-      const old = await api("/rooms/" + state.selectedRoom + "/versions/" + v);
-      saveUndo();
-      state.layouts[state.selectedRoom] = old.layout;
-      render();
-      toast("已载入历史布局，保存后生效");
-    }
     return true;
   }
   return false;
@@ -369,8 +298,8 @@ function bindFeatureEvents() {
           seen.add(e.id);
         }
         saveUndo();
-        state.layouts[state.selectedRoom] = data.elements.map(
-          ({ id, type, x, y, r, w, h }) => ({
+        setEditorElements(
+          data.elements.map(({ id, type, x, y, r, w, h }) => ({
             id,
             type,
             x,
@@ -378,7 +307,7 @@ function bindFeatureEvents() {
             r,
             ...(w !== undefined ? { w } : {}),
             ...(h !== undefined ? { h } : {}),
-          }),
+          })),
         );
         state.selection = null;
         render();

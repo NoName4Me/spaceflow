@@ -15,8 +15,9 @@ const actionLabels = {
   "building.updated": "修改楼栋",
   "floor.created": "新增楼层",
   "floor.updated": "修改楼层",
-  "template.created": "保存模板",
-  "template.deleted": "删除模板",
+  "template.created": "新增布局",
+  "template.updated": "修改布局",
+  "template.deleted": "删除布局",
   "booking.cancel": "取消预订",
   "booking.approve": "通过审批",
   "booking.reject": "拒绝申请",
@@ -37,12 +38,6 @@ const actionLabels = {
 };
 async function loadPageData(page) {
   if (page === "rooms") state.catalog = await api("/admin/locations");
-  if (page === "editor") {
-    state.templates = await api("/layout-templates");
-    state.layoutVersions = await api(
-      "/rooms/" + state.selectedRoom + "/versions",
-    );
-  }
   if (page === "schedule") {
     const request = (state.calendarRequest = (state.calendarRequest || 0) + 1);
     const result = await api(
@@ -70,9 +65,6 @@ function uiSelect(label, name, options, value) {
 }
 function uiMulti(label, name, options, values = []) {
   return `<div class="field"><label for="edit-${name}">${esc(label)}</label><select id="edit-${name}" name="${name}" multiple size="3">${options.map(([id, text]) => `<option value="${esc(id)}" ${values.includes(id) ? "selected" : ""}>${esc(text)}</option>`).join("")}</select></div>`;
-}
-function renderRooms() {
-  return `<section class="page">${pageHead("SPACES", "会议室管理", `${state.rooms.length} 间会议室`, `<button class="button primary" id="newRoom">＋ 新增会议室</button>`)}<div class="panel"><div class="management-list">${state.rooms.map((r) => `<article class="management-row"><div><h3>${esc(r.name)}</h3><p>${esc(r.code)} · ${esc(r.building)} / ${esc(r.floor)} · ${r.capacity} 人</p><small>${{ enabled: "启用", disabled: "停用", hidden: "隐藏", maintenance: "维护" }[r.status]} · ${r.repeat ? "允许周期预订" : "单次预订"}</small></div><button class="button" data-edit-room="${r.id}">编辑档案与权限</button></article>`).join("") || '<div class="empty-box">暂无会议室</div>'}</div></div></section>`;
 }
 function renderUsers() {
   return `<section class="page">${pageHead("IDENTITY", "账号与部门", "", `<button class="button" id="newDepartment">＋ 新增部门</button><button class="button primary" id="newUser">＋ 新增账号</button>`)}<div class="panel"><div class="panel-title"><h2>账号</h2></div><div class="management-list">${state.directory.users.map((u) => `<article class="management-row"><div><h3>${esc(u.name)} <small>${u.active ? "启用" : "停用"}</small></h3><p>${esc(u.username)} · ${u.role === "admin" ? "管理员" : "员工"} · ${esc(u.department || "未分配部门")}</p></div><div class="row-actions"><button class="button small" data-edit-user="${u.id}">编辑</button><button class="button small" data-reset-user="${u.id}">重置密码</button></div></article>`).join("")}</div></div><div class="panel section-gap"><div class="panel-title"><h2>部门</h2></div><div class="management-list">${state.directory.departments.map((d) => `<article class="management-row"><span>${esc(d.name)}</span><button class="button small" data-edit-department="${d.id}">重命名</button></article>`).join("") || '<div class="empty-box">暂无部门</div>'}</div></div></section>`;
@@ -169,10 +161,11 @@ function editRoom(id) {
       'required min="0" max="100000" step="0.1"',
     ) +
     uiSelect(
-      "布局类型",
-      "type",
-      ["董事会式", "U 型", "教室式", "圆桌式", "洽谈式"].map((t) => [t, t]),
-      r.type,
+      "布局",
+      "layoutTemplateId",
+      state.layoutTemplates.map((t) => [t.id, t.name]),
+      r.layoutTemplateId ||
+        state.layoutTemplates.find((t) => t.type === r.type)?.id,
     ) +
     uiSelect(
       "预订方式",
@@ -219,7 +212,10 @@ function editRoom(id) {
         floorId: f.get("floorId"),
         capacity: Number(f.get("capacity")),
         area: Number(f.get("area")),
-        type: f.get("type"),
+        type: state.layoutTemplates.find(
+          (t) => t.id === f.get("layoutTemplateId"),
+        ).type,
+        layoutTemplateId: f.get("layoutTemplateId"),
         equip: String(f.get("equip"))
           .split(/[,，]/)
           .map((s) => s.trim())
