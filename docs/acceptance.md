@@ -14,7 +14,7 @@ npm run db:verify-backup
 
 | 命令 | 范围 |
 | --- | --- |
-| `typecheck`、`build` | TypeScript 检查与可运行服务构建 |
+| `typecheck`、`build` | 前后端 TypeScript 检查、服务与 Vite 前端构建 |
 | `test` | 真实 PostgreSQL 接口、周期规则与本地 SMTP 验证 |
 | `test:ui` | 登录、管理、周期、改期、批量编辑、布局和发现页浏览器验收 |
 | `test:prototype` | 保留的原型规则与六页面冒烟检查 |
@@ -23,7 +23,9 @@ npm run db:verify-backup
 
 浏览器验收在本机使用 Google Chrome，CI 使用 Chromium。测试创建独立记录并清理，截图位于 `test-results/`。初始化及恢复验证复用本地基础环境，只创建和删除临时验证库。
 
-当前覆盖 28 项接口/规则/邮件测试与四套浏览器流程。CI 配置在 `.github/workflows/ci.yml`，推送或创建拉取请求后触发。
+当前覆盖 32 项接口/规则/邮件测试与六套浏览器流程。React 迁移检查另外覆盖焦点保留与循环、受控输入、SVG 拖拽/缩放/撤销、导入导出、快速切换日程时的过期请求取消，以及会话失效后关闭管理表单。CI 配置在 `.github/workflows/ci.yml`，推送或创建拉取请求后触发。
+
+详情预订记录另外检查倒序、分页、备注创建/修改、真实预订人、隐藏信息过滤和四个日期快捷筛选。
 
 ## 人工验收路径
 

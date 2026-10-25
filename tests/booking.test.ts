@@ -330,9 +330,10 @@ test("invalid dates, windows and past time rejected; writes audited", async () =
       400,
     );
   assert.equal((await request("/audit", member)).status, 403);
-  assert.ok(
-    (await request("/audit", admin)).data.some(
-      (r: any) => r.action === "booking.created",
-    ),
-  );
+  const audit: { id: string; action: string }[] = (
+    await request("/audit", admin)
+  ).data;
+  assert.ok(audit.some((row) => row.action === "booking.created"));
+  assert.ok(audit.every((row) => /^\d+$/.test(row.id)));
+  assert.equal(new Set(audit.map((row) => row.id)).size, audit.length);
 });

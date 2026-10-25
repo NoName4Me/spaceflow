@@ -76,11 +76,12 @@ if (process.argv.includes("--verify")) {
         "-d",
         database,
         "-Atqc",
-        "SELECT json_build_object('migrations',(SELECT count(*) FROM schema_migrations),'rooms',(SELECT count(*) FROM rooms),'templates',(SELECT count(*) FROM layout_templates),'assigned',(SELECT count(*) FROM rooms WHERE layout_template_id IS NOT NULL),'exclusion',(SELECT count(*) FROM pg_constraint WHERE conrelid='bookings'::regclass AND contype='x'),'trigger',(SELECT count(*) FROM pg_trigger WHERE tgrelid='bookings'::regclass AND NOT tgisinternal))",
+        "SELECT json_build_object('migrations',(SELECT count(*) FROM schema_migrations),'notes',(SELECT count(*) FROM information_schema.columns WHERE table_name='bookings' AND column_name='notes'),'rooms',(SELECT count(*) FROM rooms),'templates',(SELECT count(*) FROM layout_templates),'assigned',(SELECT count(*) FROM rooms WHERE layout_template_id IS NOT NULL),'exclusion',(SELECT count(*) FROM pg_constraint WHERE conrelid='bookings'::regclass AND contype='x'),'trigger',(SELECT count(*) FROM pg_trigger WHERE tgrelid='bookings'::regclass AND NOT tgisinternal))",
       ]),
     );
     if (
-      result.migrations < 8 ||
+      result.migrations < 9 ||
+      result.notes !== 1 ||
       result.templates < 1 ||
       result.assigned !== result.rooms ||
       result.exclusion !== 1 ||

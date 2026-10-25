@@ -1,0 +1,74 @@
+/* Base palette: change these values to recolor the application. */
+:root {
+  --palette-accent: #7058e8;
+  --palette-ink: #202126;
+  --palette-canvas: #f7f8fb;
+  --palette-paper: #ffffff;
+  /* Status colors remain independent from the brand accent. */
+  --palette-success: #365b92;
+  --palette-warning: #875211;
+
+  /* Purpose tokens: derived shades follow the base palette automatically. */
+  --bg: var(--palette-canvas);
+  --paper: var(--palette-paper);
+  --ink: var(--palette-ink);
+  --muted: color-mix(in srgb, var(--ink) 70%, var(--paper));
+  --line: color-mix(in srgb, var(--ink) 13%, var(--paper));
+  --line-strong: color-mix(in srgb, var(--ink) 28%, var(--paper));
+  --field-bg: var(--paper);
+  --field-border: color-mix(in srgb, var(--ink) 32%, var(--paper));
+  --field-disabled-bg: color-mix(in srgb, var(--ink) 7%, var(--paper));
+  --surface-subtle: color-mix(in srgb, var(--bg) 60%, var(--paper));
+  --surface-muted: color-mix(in srgb, var(--ink) 8%, var(--paper));
+  --surface-hover: color-mix(in srgb, var(--ink) 3%, var(--paper));
+  --surface-glass: color-mix(in srgb, var(--paper) 92%, transparent);
+  --primary: var(--palette-accent);
+  --primary-hover: color-mix(in srgb, var(--primary) 84%, var(--ink));
+  --primary-text: color-mix(in srgb, var(--primary) 78%, var(--ink));
+  --primary-soft: color-mix(in srgb, var(--primary) 9%, var(--paper));
+  --primary-border: color-mix(in srgb, var(--primary) 28%, var(--paper));
+  --focus-ring: var(--primary);
+  --success: var(--palette-success);
+  --success-soft: color-mix(in srgb, var(--success) 9%, var(--paper));
+  --warning: var(--palette-warning);
+  --warning-soft: color-mix(in srgb, var(--warning) 10%, var(--paper));
+  --overlay: color-mix(in srgb, var(--ink) 48%, transparent);
+  --shadow-color: color-mix(in srgb, var(--ink) 6%, transparent);
+  --shadow: 0 10px 40px var(--shadow-color);
+  --shadow-hover: 0 15px 42px color-mix(in srgb, var(--ink) 10%, transparent);
+  --shadow-dialog: 0 24px 80px color-mix(in srgb, var(--ink) 22%, transparent);
+
+  /* Component tokens: navigation, primary actions and shared SVG floor plans. */
+  --button-primary-bg: var(--primary);
+  --button-primary-hover: var(--primary-hover);
+  --button-primary-text: var(--paper);
+  --sidebar-bg: var(--ink);
+  --sidebar-text: color-mix(in srgb, var(--paper) 90%, var(--ink));
+  --sidebar-muted: color-mix(in srgb, var(--paper) 65%, var(--ink));
+  --sidebar-hover: color-mix(in srgb, var(--paper) 8%, var(--sidebar-bg));
+  --sidebar-border: color-mix(in srgb, var(--paper) 25%, var(--sidebar-bg));
+  --sidebar-active-bg: color-mix(
+    in srgb,
+    var(--primary) 28%,
+    var(--sidebar-bg)
+  );
+  --sidebar-active-text: var(--paper);
+  --brand-mark: color-mix(in srgb, var(--primary) 45%, var(--paper));
+  --toast-bg: var(--ink);
+  --plan-bg: var(--bg);
+  --plan-grid: var(--line);
+  --plan-floor: var(--paper);
+  --plan-wall: color-mix(in srgb, var(--ink) 30%, var(--paper));
+  --plan-table: color-mix(in srgb, var(--ink) 19%, var(--paper));
+  --plan-table-border: color-mix(in srgb, var(--ink) 39%, var(--paper));
+  --plan-chair: color-mix(in srgb, var(--ink) 10%, var(--paper));
+  --plan-chair-border: color-mix(in srgb, var(--ink) 32%, var(--paper));
+  --plan-screen: var(--ink);
+  --plan-screen-detail: color-mix(in srgb, var(--ink) 35%, var(--paper));
+  --plan-board: var(--surface-subtle);
+  --plan-board-border: var(--plan-table-border);
+  --plan-window: color-mix(in srgb, var(--palette-success) 24%, var(--paper));
+  --plan-window-detail: var(--paper);
+  --plan-door: var(--plan-table-border);
+  --plan-selection: var(--focus-ring);
+}

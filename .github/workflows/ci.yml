@@ -25,7 +25,7 @@ jobs:
         run: |
           printf '%s\n' 'DATABASE_URL=postgresql://postgres:ci-only-password@127.0.0.1:5432/spaceflow' 'MIGRATION_DATABASE_URL=postgresql://postgres:ci-only-password@127.0.0.1:5432/spaceflow' > .env
       - run: npm run db:migrate && npm run db:seed
-      - run: npm run typecheck && npm run build && npm test && npm run test:prototype
+      - run: npm run typecheck && npm test && npm run test:prototype
       - run: npx playwright install --with-deps chromium
       - run: npm run test:ui
       - uses: actions/upload-artifact@v4

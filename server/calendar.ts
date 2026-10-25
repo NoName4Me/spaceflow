@@ -1,3 +1,4 @@
+import { bookingView } from "./booking-view.ts";
 import { Router } from "express";
 import { z } from "zod";
 import { pool } from "./db.ts";
@@ -39,28 +40,14 @@ calendar.get("/calendar", async (req, res) => {
   end.setUTCDate(end.getUTCDate() + dates.length);
   const bookings = (
     await pool.query(
-      "SELECT *,to_char(start_at AT TIME ZONE 'Asia/Shanghai','YYYY-MM-DD') AS date,to_char(start_at AT TIME ZONE 'Asia/Shanghai','HH24:MI') AS start,to_char(end_at AT TIME ZONE 'Asia/Shanghai','HH24:MI') AS end FROM bookings WHERE room_id=ANY($1::text[]) AND status IN ('confirmed','pending') AND start_at>=$2 AND start_at<$3 ORDER BY start_at",
+      "SELECT b.*,u.name AS owner_name,to_char(start_at AT TIME ZONE 'Asia/Shanghai','YYYY-MM-DD') AS date,to_char(start_at AT TIME ZONE 'Asia/Shanghai','HH24:MI') AS start,to_char(end_at AT TIME ZONE 'Asia/Shanghai','HH24:MI') AS end FROM bookings b JOIN users u ON u.id=b.user_id WHERE room_id=ANY($1::text[]) AND status IN ('confirmed','pending') AND start_at>=$2 AND start_at<$3 ORDER BY start_at",
       [
         rooms.map((r) => r.id),
         dates[0] + "T00:00:00+08:00",
         end.toISOString().slice(0, 10) + "T00:00:00+08:00",
       ],
     )
-  ).rows.map((b) => ({
-    id: b.id,
-    roomId: b.room_id,
-    date: b.date,
-    start: b.start,
-    end: b.end,
-    status: b.status,
-    hidden: b.hidden,
-    revision: b.revision,
-    seriesId: b.series_id,
-    owner: b.user_id === req.user.id ? "me" : "other",
-    ...(!b.hidden || b.user_id === req.user.id || req.user.role === "admin"
-      ? { title: b.title, contact: b.contact, phone: b.phone }
-      : { title: "已占用" }),
-  }));
+  ).rows.map((b) => bookingView(b, req.user));
   res.json({
     dates,
     rooms,

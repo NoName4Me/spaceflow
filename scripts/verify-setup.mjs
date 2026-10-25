@@ -49,9 +49,10 @@ try {
   const {
     rows: [r],
   } = await client.query(
-    "SELECT (SELECT count(*)::int FROM rooms) AS rooms,(SELECT count(*)::int FROM rooms WHERE floor_id IS NOT NULL) AS assigned,(SELECT count(*)::int FROM rooms WHERE layout_template_id IS NOT NULL) AS assigned_layouts,(SELECT count(*)::int FROM layout_templates) AS templates,(SELECT count(*)::int FROM layout_versions) AS layouts,(SELECT count(*)::int FROM users) AS users",
+    "SELECT (SELECT count(*)::int FROM information_schema.columns WHERE table_name='bookings' AND column_name='notes') AS notes,(SELECT count(*)::int FROM rooms) AS rooms,(SELECT count(*)::int FROM rooms WHERE floor_id IS NOT NULL) AS assigned,(SELECT count(*)::int FROM rooms WHERE layout_template_id IS NOT NULL) AS assigned_layouts,(SELECT count(*)::int FROM layout_templates) AS templates,(SELECT count(*)::int FROM layout_versions) AS layouts,(SELECT count(*)::int FROM users) AS users",
   );
   if (
+    r.notes !== 1 ||
     r.rooms !== 6 ||
     r.assigned !== 6 ||
     r.assigned_layouts !== 6 ||

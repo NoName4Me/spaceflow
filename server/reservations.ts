@@ -23,6 +23,7 @@ const createSchema = windowSchema
     contact: text,
     phone: text,
     hidden: z.boolean(),
+    notes: z.string().trim().max(2000).default(""),
     skipDates: z.array(date).max(52).default([]),
   })
   .strict();
@@ -151,7 +152,7 @@ export function reservationRoutes(expire: () => Promise<void>) {
         ids.push(id);
         const status = room.rule === "approval" ? "pending" : "confirmed";
         await c.query(
-          "INSERT INTO bookings(id,room_id,user_id,title,contact,phone,hidden,start_at,end_at,status,expires_at,series_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,CASE WHEN $10='pending' THEN LEAST(now()+interval '24 hours',$8::timestamptz) END,$11)",
+          "INSERT INTO bookings(id,room_id,user_id,title,contact,phone,hidden,start_at,end_at,status,expires_at,series_id,notes) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,CASE WHEN $10='pending' THEN LEAST(now()+interval '24 hours',$8::timestamptz) END,$11,$12)",
           [
             id,
             b.roomId,
@@ -164,6 +165,7 @@ export function reservationRoutes(expire: () => Promise<void>) {
             w.end,
             status,
             seriesId,
+            b.notes,
           ],
         );
         await c.query(

@@ -1,3 +1,5 @@
+import { roomBookings } from "./room-bookings.ts";
+import { bookingView } from "./booking-view.ts";
 import { bulkRooms } from "./bulk-rooms.ts";
 import { calendar } from "./calendar.ts";
 import { layoutSchema, layouts } from "./layouts.ts";
@@ -163,29 +165,13 @@ app.get("/api/state", async (req, res) => {
   const roomIds = rooms.map((r) => r.id);
   const bookings = (
     await pool.query(
-      `SELECT b.*,to_char(start_at AT TIME ZONE 'Asia/Shanghai','YYYY-MM-DD') AS date,to_char(start_at AT TIME ZONE 'Asia/Shanghai','HH24:MI') AS start,to_char(end_at AT TIME ZONE 'Asia/Shanghai','HH24:MI') AS end FROM bookings b WHERE (room_id=ANY($2::text[]) AND ($3::boolean OR status IN ('pending','confirmed'))) OR user_id=$1 ORDER BY start_at DESC LIMIT 10000`,
+      `SELECT b.*,u.name AS owner_name,to_char(start_at AT TIME ZONE 'Asia/Shanghai','YYYY-MM-DD') AS date,to_char(start_at AT TIME ZONE 'Asia/Shanghai','HH24:MI') AS start,to_char(end_at AT TIME ZONE 'Asia/Shanghai','HH24:MI') AS end FROM bookings b JOIN users u ON u.id=b.user_id WHERE (room_id=ANY($2::text[]) AND ($3::boolean OR status IN ('pending','confirmed'))) OR b.user_id=$1 ORDER BY start_at DESC LIMIT 10000`,
       [req.user.id, roomIds, req.user.role === "admin"],
     )
-  ).rows.map((b) => {
-    const visible =
-      !b.hidden || b.user_id === req.user.id || req.user.role === "admin";
-    return {
-      id: b.id,
-      roomId: b.room_id,
-      roomName: allRooms.find((r) => r.id === b.room_id)?.data.name,
-      seriesId: b.series_id,
-      revision: b.revision,
-      date: b.date,
-      start: b.start,
-      end: b.end,
-      status: b.status,
-      hidden: b.hidden,
-      owner: b.user_id === req.user.id ? "me" : "other",
-      ...(visible
-        ? { title: b.title, contact: b.contact, phone: b.phone }
-        : { title: "已占用" }),
-    };
-  });
+  ).rows.map((b) => ({
+    ...bookingView(b, req.user),
+    roomName: allRooms.find((r) => r.id === b.room_id)?.data.name,
+  }));
   res.json({
     user: req.user,
     rooms: rooms.map((r) => ({
@@ -227,6 +213,7 @@ app.get("/api/state", async (req, res) => {
     ).rows[0].count,
   });
 });
+app.use("/api", roomBookings);
 app.use("/api", management);
 app.use("/api", bulkRooms);
 app.use("/api", (req, res, next) => {
@@ -355,7 +342,7 @@ app.get("/api/audit", admin, async (_req, res) =>
   res.json(
     (
       await pool.query(
-        `SELECT a.action,a.target,a.created_at,u.name,
+        `SELECT a.id,a.action,a.target,a.created_at,u.name,
  COALESCE(b.title || ' · ' || (br.data->>'name'),r.data->>'name',target_user.name,d.name,sr.data->>'name',location_building.name,location_floor.name,template.name,'已删除对象') AS target_name
  FROM audit a LEFT JOIN users u ON a.actor=u.id
  LEFT JOIN bookings b ON b.id::text=a.target LEFT JOIN rooms br ON br.id=b.room_id
@@ -370,7 +357,7 @@ app.get("/api/audit", admin, async (_req, res) =>
   ),
 );
 app.use("/api", (_req, _res, next) => next(fail(404, "接口不存在")));
-app.use(express.static(new URL("../web/", import.meta.url).pathname));
+app.use(express.static(new URL("../dist/client/", import.meta.url).pathname));
 app.use((error: any, _req: Request, res: Response, _next: NextFunction) => {
   const conflict = error.code === "23P01";
   const duplicate = error.code === "23505",

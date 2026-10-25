@@ -2,7 +2,7 @@
 
 ## 初始化与容器运行
 
-需要 Node.js 22+、npm、Docker，以及 `~/jonge/infra` 的 PostgreSQL 和 `local-infra` 网络。基础环境路径可用 `INFRA_DIR` 覆盖。
+需要 Node.js 22.12+、npm、Docker，以及 `~/jonge/infra` 的 PostgreSQL 和 `local-infra` 网络。基础环境路径可用 `INFRA_DIR` 覆盖。
 
 ```bash
 npm ci
@@ -31,7 +31,9 @@ docker compose --env-file .env.container stop app https
 npm run dev
 ```
 
-后端源文件变更自动重启，前端修改后刷新浏览器。构建后也可直接运行：
+`npm run dev` 同时启动后端（3080）与 Vite（5173）。开发访问 `http://127.0.0.1:5173`，API 通过代理转发，前端修改自动热更新、后端修改自动重启。开发脚本会添加本地 Vite 来源；退出时同时关闭两个进程。
+
+构建后也可直接运行：
 
 ```bash
 npm run build
@@ -39,6 +41,15 @@ npm start
 ```
 
 以上停止命令不关闭共享基础服务。开发完成后运行 `npm run deploy:local` 或 `npm run deploy:https` 恢复容器模式。
+
+## 界面主题
+
+`client/src/theme.css` 是当前应用的颜色入口，在 `styles.css` 之前加载，采用基础色 → 用途变量 → 组件变量三层组织。
+
+- 通常只需修改开头的 `--palette-accent`（主色）、`--palette-ink`（墨色）、`--palette-canvas`（页面底色）、`--palette-paper`（面板底色）。悬停、选中背景、边框、阴影和布局图的灰阶通过 `color-mix()` 派生。
+- `--palette-success` 和 `--palette-warning` 独立表达可用、提示等状态，换品牌色时可保持不变。
+- 页面样式使用用途变量；侧栏、主按钮和 React SVG 组件使用相应组件变量。布局 JSON 不保存颜色值，缩略图、详情和编辑器共享主题。
+- 换色后检查实际页面、键盘焦点和文字对比度，执行 `npm run test:ui`。派生颜色不能保证任意基础色组合都可读；浅色主按钮需要同时调整 `--button-primary-text`。
 
 ## 配置
 
@@ -78,7 +89,7 @@ npm run verify:setup
 | 路径 | 内容 |
 | --- | --- |
 | `server/` | 业务服务 |
-| `web/` | 当前应用界面 |
+| `client/` | React、TypeScript 界面与主题 |
 | `migrations/` | 数据库迁移 |
 | `tests/` | 接口与浏览器测试 |
 | `deploy/`、`compose.yaml`、`Dockerfile` | 容器与 HTTPS 配置 |

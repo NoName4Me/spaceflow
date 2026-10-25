@@ -13,6 +13,7 @@ const schema = z
     contact: text,
     phone: text,
     hidden: z.boolean(),
+    notes: z.string().trim().max(2000).optional(),
     roomId: text,
     date: z.iso.date(),
     start: clock,
@@ -112,7 +113,7 @@ bookingEdits.put("/bookings/:id", async (req, res) => {
       const status =
         room.rule === "approval" && timeChanged(o) ? "pending" : o.status;
       await c.query(
-        "UPDATE bookings SET room_id=$1,title=$2,contact=$3,phone=$4,hidden=$5,start_at=$6,end_at=$7,status=$8,expires_at=CASE WHEN $8='pending' THEN LEAST(COALESCE($10::timestamptz,now()+interval '24 hours'),$6::timestamptz) ELSE NULL END,revision=revision+1 WHERE id=$9",
+        "UPDATE bookings SET room_id=$1,title=$2,contact=$3,phone=$4,hidden=$5,start_at=$6,end_at=$7,status=$8,expires_at=CASE WHEN $8='pending' THEN LEAST(COALESCE($10::timestamptz,now()+interval '24 hours'),$6::timestamptz) ELSE NULL END,notes=COALESCE($11,notes),revision=revision+1 WHERE id=$9",
         [
           b.roomId,
           b.title,
@@ -124,6 +125,7 @@ bookingEdits.put("/bookings/:id", async (req, res) => {
           status,
           o.id,
           timeChanged(o) ? null : o.expires_at,
+          b.notes ?? null,
         ],
       );
       if (o.series_id && timeChanged(o))

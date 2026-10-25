@@ -4,7 +4,7 @@
 
 ## 启动
 
-需要 Node.js 22+、Docker，以及 `~/jonge/infra` 中运行的 PostgreSQL。
+需要 Node.js 22.12+、Docker，以及 `~/jonge/infra` 中运行的 PostgreSQL。
 
 ```bash
 npm ci
@@ -22,6 +22,10 @@ npm run deploy:local
 - 单次或每天、每周、每月预订，支持指定星期、冲突预览、改期及系列后续修改。
 - 会议室级可见与可订权限、审批占位、隐私过滤、管理员代订。
 - 账号与部门管理、站内通知、可配置 SMTP 邮件、操作记录。
+
+## 技术栈
+
+React 19、TypeScript、Vite、CSS 主题变量与 SVG；后端使用 Express 5、Zod、PostgreSQL，Docker Compose 部署。
 
 ## 文档
 
