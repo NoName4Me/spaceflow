@@ -203,6 +203,8 @@ try {
   await page.screenshot({ path: "test-results/rooms-bulk-list.png" });
   await page.getByRole("button", { name: "退出登录", exact: true }).click();
   await login(memberId);
+  if (!(await page.locator("#f-building").isVisible()))
+    await page.getByRole("button", { name: "更多筛选", exact: true }).click();
   await page.locator("#f-building").selectOption(buildingName);
   await expect(page.locator(".room-card")).toHaveCount(3);
   await expect(page.getByRole("button", { name: /查看详情/ })).toHaveCount(0);
@@ -229,6 +231,8 @@ try {
   await accessible();
   await page.screenshot({ path: "test-results/discovery-list.png" });
   await page.reload();
+  if (!(await page.locator("#f-building").isVisible()))
+    await page.getByRole("button", { name: "更多筛选", exact: true }).click();
   await page.locator("#f-building").selectOption(buildingName);
   await expect(page.locator(".discovery-list-row")).toHaveCount(3);
   await page.locator(`[data-room="${rooms[0]}"]`).focus();

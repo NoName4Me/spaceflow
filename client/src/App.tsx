@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import { json, message } from "./api";
 import { EditModal, Empty } from "./components/ui";
 import {
@@ -13,6 +19,8 @@ import { Discovery, RoomDetail } from "./pages/Discovery";
 import { Layouts } from "./pages/Layouts";
 import { Rooms } from "./pages/Rooms";
 import { Schedule } from "./pages/Schedule";
+import { useDialogFocus } from "./components/useDialogFocus";
+import { NavIcon } from "./components/NavIcon";
 import { useWorkspace } from "./workspace";
 import type { Page } from "./types";
 const titles: Record<Page, string> = {
@@ -29,18 +37,28 @@ const titles: Record<Page, string> = {
   account: "账号设置",
   notifications: "通知",
 };
-const nav: [Page, string][] = [
-  ["explore", "◫"],
-  ["schedule", "▦"],
-  ["mine", "▤"],
-  ["rooms", "▣"],
-  ["users", "♙"],
-  ["reservations", "▤"],
-  ["audit", "≡"],
-  ["approvals", "✓"],
-  ["editor", "⌗"],
-  ["settings", "⚙"],
+const nav: Page[] = [
+  "explore",
+  "schedule",
+  "mine",
+  "rooms",
+  "users",
+  "reservations",
+  "audit",
+  "approvals",
+  "editor",
+  "settings",
 ];
+function NavigationFocus({
+  panel,
+  close,
+}: {
+  panel: RefObject<HTMLElement | null>;
+  close: () => void;
+}) {
+  useDialogFocus(panel, close);
+  return null;
+}
 function Login() {
   const { request, refresh } = useWorkspace(),
     [busy, setBusy] = useState(false),
@@ -116,6 +134,27 @@ export function App() {
   } = useWorkspace();
   const booking = useBookingActions(),
     [detail, setDetail] = useState<string | null>(null);
+  const [navigationOpen, setNavigationOpen] = useState(false);
+  const navigationPanel = useRef<HTMLElement>(null);
+  const closeNavigation = useCallback(() => setNavigationOpen(false), []);
+  const goTo = (next: Page) => {
+    navigate(next);
+    closeNavigation();
+  };
+  useEffect(() => {
+    if (!navigationOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const wide = window.matchMedia("(min-width: 961px)");
+    const onResize = () => {
+      if (wide.matches) closeNavigation();
+    };
+    wide.addEventListener("change", onResize);
+    return () => {
+      document.body.style.overflow = previous;
+      wide.removeEventListener("change", onResize);
+    };
+  }, [navigationOpen, closeNavigation]);
   const closeDetail = useCallback(() => setDetail(null), []);
   useEffect(() => {
     document.body.classList.toggle("logged-out", !data);
@@ -127,8 +166,9 @@ export function App() {
     if (!data) {
       closeDetail();
       booking.close();
+      closeNavigation();
     }
-  }, [data, closeDetail, booking.close]);
+  }, [data, closeDetail, booking.close, closeNavigation]);
   const showDetail = (id: string) =>
     void run(async () => {
       const current = await refresh();
@@ -143,16 +183,17 @@ export function App() {
     booking.close();
   };
   const admin = data?.user.role === "admin";
-  const menu = (items: typeof nav) =>
-    items.map(([key, icon]) => (
+  const menu = (items: Page[]) =>
+    items.map((key) => (
       <button
         key={key}
         data-page={key}
         className={`nav-item ${page === key ? "active" : ""}`}
-        onClick={() => navigate(key)}
+        onClick={() => goTo(key)}
+        aria-current={page === key ? "page" : undefined}
       >
         <span className="nav-icon" aria-hidden="true">
-          {icon}
+          <NavIcon page={key} />
         </span>{" "}
         {titles[key]}
       </button>
@@ -165,7 +206,32 @@ export function App() {
         <Login />
       ) : (
         <div id="app">
-          <aside className="sidebar">
+          {navigationOpen && (
+            <NavigationFocus panel={navigationPanel} close={closeNavigation} />
+          )}
+          {navigationOpen && (
+            <button
+              className="navigation-scrim"
+              aria-label="关闭导航"
+              onClick={closeNavigation}
+              tabIndex={-1}
+            />
+          )}
+          <aside
+            ref={navigationPanel}
+            id="workspaceNavigation"
+            className={`sidebar ${navigationOpen ? "navigation-open" : ""}`}
+            role={navigationOpen ? "dialog" : undefined}
+            aria-modal={navigationOpen || undefined}
+            aria-label="工作空间导航"
+          >
+            <button
+              className="navigation-close icon-btn"
+              aria-label="关闭导航菜单"
+              onClick={closeNavigation}
+            >
+              <NavIcon page="close" />
+            </button>
             <div className="brand">
               <span className="brand-mark">
                 <i />
@@ -200,7 +266,7 @@ export function App() {
               <button
                 data-page="account"
                 className="button wide"
-                onClick={() => navigate("account")}
+                onClick={() => goTo("account")}
               >
                 账号设置
               </button>
@@ -218,11 +284,22 @@ export function App() {
               </button>
             </div>
           </aside>
-          <main className="main">
+          <main className="main" inert={navigationOpen}>
             <header className="topbar">
-              <div className="breadcrumbs">
-                <span>间序 / </span>
-                <h1 id="crumb">{titles[page]}</h1>
+              <div className="header-location">
+                <button
+                  className="navigation-toggle icon-btn"
+                  aria-label="打开导航菜单"
+                  aria-expanded={navigationOpen}
+                  aria-controls="workspaceNavigation"
+                  onClick={() => setNavigationOpen(true)}
+                >
+                  <NavIcon page="menu" />
+                </button>
+                <div className="breadcrumbs">
+                  <span>间序 / </span>
+                  <h1 id="crumb">{titles[page]}</h1>
+                </div>
               </div>
               <div className="header-right">
                 <button

@@ -177,6 +177,45 @@ try {
   await expect(page.locator('[data-drop-date="' + oldDate + '"]')).toHaveCount(
     0,
   );
+  // A mobile navigation drawer isolates focus, closes with Escape, and clears
+  // its modal state when the user selects a destination or the viewport grows.
+  await page.setViewportSize({ width: 390, height: 844 });
+  const navigationToggle = page.getByRole("button", {
+    name: "打开导航菜单",
+    exact: true,
+  });
+  await expect(page.locator("#workspaceNavigation")).toBeHidden();
+  await navigationToggle.focus();
+  await page.keyboard.press("Enter");
+  const closeNavigation = page.getByRole("button", {
+    name: "关闭导航菜单",
+    exact: true,
+  });
+  await expect(closeNavigation).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(
+    page.getByRole("button", { name: "退出登录", exact: true }),
+  ).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(closeNavigation).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(navigationToggle).toBeFocused();
+  await expect(page.locator("main")).not.toHaveAttribute("inert");
+  await navigationToggle.click();
+  await page.getByRole("button", { name: "空间发现", exact: true }).click();
+  await expect(page.locator("#workspaceNavigation")).toBeHidden();
+  const firstRoom = await page
+    .locator(".room-card .room-topline")
+    .first()
+    .boundingBox();
+  expect(firstRoom).not.toBeNull();
+  expect(firstRoom!.y + firstRoom!.height).toBeLessThan(844);
+  await navigationToggle.click();
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await expect(page.locator("#workspaceNavigation")).not.toHaveAttribute(
+    "aria-modal",
+  );
+  await expect(page.locator("main")).not.toHaveAttribute("inert");
   // Session loss must remove an open management form and all authenticated UI.
   await page.getByRole("button", { name: "会议室管理", exact: true }).click();
   await trigger.click();

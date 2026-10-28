@@ -36,6 +36,7 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
       return "grid";
     }
   });
+  const [moreFilters, setMoreFilters] = useState(false);
   const preview = useRoomPreview();
   if (!data) return null;
   const buildings = [...new Set(data.rooms.map((r) => r.building))],
@@ -64,37 +65,9 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
           ? "不可预订"
           : "时段占用";
   return (
-    <section className="page">
+    <section className="page discovery-page">
       <div className="filter-surface">
         <div className="filter-grid">
-          <div className="field">
-            <label htmlFor="f-building">楼栋</label>
-            <select
-              id="f-building"
-              value={f.building}
-              onChange={(e) =>
-                setFilters({ ...f, building: e.target.value, floor: "all" })
-              }
-            >
-              <option value="all">全部楼栋</option>
-              {buildings.map((b) => (
-                <option key={b}>{b}</option>
-              ))}
-            </select>
-          </div>
-          <div className="field">
-            <label htmlFor="f-floor">楼层</label>
-            <select
-              id="f-floor"
-              value={f.floor}
-              onChange={(e) => setFilters({ ...f, floor: e.target.value })}
-            >
-              <option value="all">全部楼层</option>
-              {floors.map((f) => (
-                <option key={f}>{f}</option>
-              ))}
-            </select>
-          </div>
           <div className="field">
             <label htmlFor="f-date">日期</label>
             <input
@@ -104,24 +77,6 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
               onChange={(e) =>
                 e.target.value && setFilters({ ...f, date: e.target.value })
               }
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="f-start">开始时间</label>
-            <input
-              id="f-start"
-              type="time"
-              value={f.start}
-              onChange={(e) => setFilters({ ...f, start: e.target.value })}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="f-end">结束时间</label>
-            <input
-              id="f-end"
-              type="time"
-              value={f.end}
-              onChange={(e) => setFilters({ ...f, end: e.target.value })}
             />
           </div>
           <div className="field">
@@ -141,25 +96,54 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
               ))}
             </select>
           </div>
+          <div className="field">
+            <label htmlFor="f-start">开始时间</label>
+            <input
+              id="f-start"
+              type="time"
+              value={f.start}
+              onChange={(e) => setFilters({ ...f, start: e.target.value })}
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="f-end">结束时间</label>
+            <input
+              id="f-end"
+              type="time"
+              value={f.end}
+              onChange={(e) => setFilters({ ...f, end: e.target.value })}
+            />
+          </div>
         </div>
-        <div className="filter-row2">
-          {["投屏", "视频会议", "白板", "音响"].map((e) => (
-            <button
-              key={e}
-              className={`chip ${f.equip.includes(e) ? "on" : ""}`}
-              aria-pressed={f.equip.includes(e)}
-              onClick={() =>
-                setFilters({
-                  ...f,
-                  equip: f.equip.includes(e)
-                    ? f.equip.filter((v) => v !== e)
-                    : [...f.equip, e],
-                })
-              }
+        <div className="filter-actions">
+          <button
+            className={`filter-toggle ${moreFilters ? "active" : ""}`}
+            aria-expanded={moreFilters}
+            aria-controls="additionalFilters"
+            onClick={() => setMoreFilters(!moreFilters)}
+          >
+            更多筛选
+            {(f.building !== "all" ||
+              f.floor !== "all" ||
+              f.equip.length > 0) && (
+              <span className="filter-count">
+                {Number(f.building !== "all") +
+                  Number(f.floor !== "all") +
+                  f.equip.length}
+              </span>
+            )}
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              aria-hidden="true"
             >
-              {e}
-            </button>
-          ))}
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </button>
           <button
             className="linklike"
             id="clearFilters"
@@ -167,6 +151,62 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
           >
             重置
           </button>
+        </div>
+        <div
+          id="additionalFilters"
+          className="filter-extra"
+          hidden={!moreFilters}
+        >
+          <div className="filter-locations">
+            {" "}
+            <div className="field">
+              <label htmlFor="f-building">楼栋</label>
+              <select
+                id="f-building"
+                value={f.building}
+                onChange={(e) =>
+                  setFilters({ ...f, building: e.target.value, floor: "all" })
+                }
+              >
+                <option value="all">全部楼栋</option>
+                {buildings.map((b) => (
+                  <option key={b}>{b}</option>
+                ))}
+              </select>
+            </div>
+            <div className="field">
+              <label htmlFor="f-floor">楼层</label>
+              <select
+                id="f-floor"
+                value={f.floor}
+                onChange={(e) => setFilters({ ...f, floor: e.target.value })}
+              >
+                <option value="all">全部楼层</option>
+                {floors.map((f) => (
+                  <option key={f}>{f}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="filter-row2">
+            {["投屏", "视频会议", "白板", "音响"].map((e) => (
+              <button
+                key={e}
+                className={`chip ${f.equip.includes(e) ? "on" : ""}`}
+                aria-pressed={f.equip.includes(e)}
+                onClick={() =>
+                  setFilters({
+                    ...f,
+                    equip: f.equip.includes(e)
+                      ? f.equip.filter((v) => v !== e)
+                      : [...f.equip, e],
+                  })
+                }
+              >
+                {e}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
       <div className="results-toolbar">
@@ -260,7 +300,14 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
                 <span className="room-meta">
                   {r.building} / {r.floor} · {r.code}
                 </span>
-                <span className="room-layout-type">{r.type}</span>
+                <span className="room-layout-type">
+                  <span>{r.type}</span>
+                  {r.rule !== "instant" && (
+                    <span className="room-rule">
+                      {r.rule === "approval" ? "需要审批" : "仅管理员预订"}
+                    </span>
+                  )}
+                </span>
                 <span className="amenities">
                   <Facilities room={r} />
                 </span>

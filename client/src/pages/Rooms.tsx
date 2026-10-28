@@ -614,7 +614,7 @@ export function Rooms() {
           <div className="table-scroll">
             <table className="room-management-table">
               <colgroup>
-                {[5, 15, 14, 7, 7, 13, 13, 9, 7, 10].map((width, i) => (
+                {[5, 22, 8, 8, 13, 15, 12, 9, 8].map((width, i) => (
                   <col key={i} style={{ width: width + "%" }} />
                 ))}
               </colgroup>
@@ -631,7 +631,6 @@ export function Rooms() {
                   </th>
                   {[
                     "会议室",
-                    "位置",
                     "容量",
                     "面积",
                     "布局",
@@ -666,10 +665,9 @@ export function Rooms() {
                     </td>
                     <td>
                       <strong>{r.name}</strong>
-                      <small>{r.code}</small>
-                    </td>
-                    <td>
-                      {r.building} / {r.floor}
+                      <small>
+                        {r.building} / {r.floor} · {r.code}
+                      </small>
                     </td>
                     <td>{r.capacity} 人</td>
                     <td>{r.area} ㎡</td>
@@ -695,7 +693,7 @@ export function Rooms() {
                 ))}
                 {!rows.length && (
                   <tr>
-                    <td colSpan={10} className="empty-box">
+                    <td colSpan={9} className="empty-box">
                       暂无会议室
                     </td>
                   </tr>

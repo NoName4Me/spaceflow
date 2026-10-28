@@ -2,7 +2,7 @@
 :root {
   --palette-accent: #7058e8;
   --palette-ink: #202126;
-  --palette-canvas: #f7f8fb;
+  --palette-canvas: #f6f7f9;
   --palette-paper: #ffffff;
   /* Status colors remain independent from the brand accent. */
   --palette-success: #365b92;
@@ -42,26 +42,22 @@
   --button-primary-bg: var(--primary);
   --button-primary-hover: var(--primary-hover);
   --button-primary-text: var(--paper);
-  --sidebar-bg: var(--ink);
-  --sidebar-text: color-mix(in srgb, var(--paper) 90%, var(--ink));
-  --sidebar-muted: color-mix(in srgb, var(--paper) 65%, var(--ink));
-  --sidebar-hover: color-mix(in srgb, var(--paper) 8%, var(--sidebar-bg));
-  --sidebar-border: color-mix(in srgb, var(--paper) 25%, var(--sidebar-bg));
-  --sidebar-active-bg: color-mix(
-    in srgb,
-    var(--primary) 28%,
-    var(--sidebar-bg)
-  );
-  --sidebar-active-text: var(--paper);
-  --brand-mark: color-mix(in srgb, var(--primary) 45%, var(--paper));
+  --sidebar-bg: #eef0f4;
+  --sidebar-text: var(--ink);
+  --sidebar-muted: var(--muted);
+  --sidebar-hover: color-mix(in srgb, var(--ink) 5%, var(--sidebar-bg));
+  --sidebar-border: var(--line);
+  --sidebar-active-bg: var(--primary-soft);
+  --sidebar-active-text: var(--primary-text);
+  --brand-mark: var(--primary);
   --toast-bg: var(--ink);
-  --plan-bg: var(--bg);
+  --plan-bg: #f1f3f7;
   --plan-grid: var(--line);
   --plan-floor: var(--paper);
   --plan-wall: color-mix(in srgb, var(--ink) 30%, var(--paper));
-  --plan-table: color-mix(in srgb, var(--ink) 19%, var(--paper));
-  --plan-table-border: color-mix(in srgb, var(--ink) 39%, var(--paper));
-  --plan-chair: color-mix(in srgb, var(--ink) 10%, var(--paper));
+  --plan-table: #e4e0f4;
+  --plan-table-border: #918ba8;
+  --plan-chair: #f2f0f8;
   --plan-chair-border: color-mix(in srgb, var(--ink) 32%, var(--paper));
   --plan-screen: var(--ink);
   --plan-screen-detail: color-mix(in srgb, var(--ink) 35%, var(--paper));

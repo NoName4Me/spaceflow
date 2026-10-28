@@ -1,6 +1,8 @@
 :root {
   color-scheme: light;
   font-family: "DM Sans", "Noto Sans SC", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
   color: var(--ink);
 }
 * {
@@ -43,7 +45,7 @@ p {
 }
 h1 {
   font-size: 28px;
-  letter-spacing: -1.2px;
+  letter-spacing: -0.03em;
   font-weight: 700;
 }
 h2 {
@@ -61,10 +63,11 @@ small {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 242px;
+  width: 208px;
   background: var(--sidebar-bg);
   color: var(--sidebar-text);
-  padding: 30px 15px;
+  padding: 24px 12px;
+  border-right: 1px solid var(--line);
   display: flex;
   flex-direction: column;
   z-index: 20;
@@ -73,7 +76,7 @@ small {
   display: flex;
   gap: 13px;
   align-items: center;
-  padding: 3px 14px 45px;
+  padding: 0 12px 28px;
 }
 .brand strong {
   display: block;
@@ -115,7 +118,7 @@ small {
   font-weight: 700;
 }
 .admin-label {
-  padding-top: 34px;
+  padding-top: 24px;
 }
 .sidebar nav {
   display: grid;
@@ -125,17 +128,17 @@ small {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
   border: 0;
   background: transparent;
   color: var(--sidebar-text);
-  padding: 13px 15px;
+  padding: 11px 12px;
   border-radius: 4px;
   text-align: left;
-  font-size: 13px;
+  font-size: 14px;
 }
 .nav-item:hover {
-  color: var(--paper);
+  color: var(--ink);
   background: var(--sidebar-hover);
 }
 .nav-item.active {
@@ -143,8 +146,9 @@ small {
   background: var(--sidebar-active-bg);
 }
 .nav-icon {
-  font-size: 19px;
-  width: 21px;
+  display: inline-flex;
+  width: 20px;
+  flex-shrink: 0;
   text-align: center;
   line-height: 1;
 }
@@ -208,21 +212,21 @@ small {
   letter-spacing: 3px;
 }
 .main {
-  margin-left: 242px;
+  margin-left: 208px;
+  min-width: 0;
   min-height: 100vh;
 }
 .topbar {
-  height: 76px;
-  background: var(--surface-glass);
+  height: 64px;
+  background: var(--paper);
   border-bottom: 1px solid var(--line);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 42px;
+  padding: 0 28px;
   position: sticky;
   top: 0;
   z-index: 10;
-  backdrop-filter: blur(18px);
 }
 .breadcrumbs {
   font-size: 12px;
@@ -235,7 +239,7 @@ small {
 .header-right {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 12px;
 }
 .trial-pill {
   font-size: 10px;
@@ -267,7 +271,7 @@ small {
   color: var(--muted);
 }
 .page {
-  padding: 40px 42px 55px;
+  padding: 24px 28px 40px;
   max-width: 1700px;
   margin: auto;
 }
@@ -304,11 +308,12 @@ small {
   align-items: center;
   gap: 9px;
   justify-content: center;
-  transition: 0.2s;
+  transition:
+    background-color 160ms ease-out,
+    border-color 160ms ease-out;
 }
 .button:hover {
   border-color: var(--line-strong);
-  transform: translateY(-1px);
 }
 .button.primary {
   background: var(--button-primary-bg);
@@ -334,16 +339,17 @@ small {
   align-items: center;
 }
 .filter-surface {
-  border: 1px solid var(--line);
-  background: var(--paper);
-  box-shadow: var(--shadow);
-  padding: 21px;
-  border-radius: 13px;
-  margin-bottom: 25px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px 20px;
 }
 .filter-grid {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr auto;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr;
   gap: 12px;
   align-items: end;
 }
@@ -362,10 +368,10 @@ small {
   height: 42px;
   background: var(--field-bg);
   border: 1px solid var(--field-border);
-  border-radius: 7px;
+  border-radius: 6px;
   padding: 0 11px;
   color: var(--ink);
-  font-size: 12px;
+  font-size: 14px;
 }
 .field textarea {
   height: auto;
@@ -380,9 +386,8 @@ small {
   display: flex;
   gap: 8px;
   align-items: center;
-  margin-top: 17px;
-  border-top: 1px solid var(--line);
-  padding-top: 15px;
+  margin-top: 12px;
+  flex-wrap: wrap;
 }
 .filter-label {
   font-size: 11px;
@@ -416,7 +421,7 @@ small {
 }
 .rooms-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
 }
 .room-card {
@@ -424,18 +429,18 @@ small {
   border: 1px solid var(--line);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: var(--shadow);
-  transition: 0.2s;
+  transition:
+    background-color 160ms ease-out,
+    border-color 160ms ease-out;
 }
 .room-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-hover);
+  border-color: var(--primary-border);
 }
 .room-art {
-  height: 176px;
+  height: 136px;
   position: relative;
   background: var(--plan-bg);
-  padding: 13px;
+  padding: 8px;
   overflow: hidden;
 }
 .room-art svg {
@@ -468,7 +473,7 @@ small {
   color: var(--warning);
 }
 .room-info {
-  padding: 19px 19px 20px;
+  padding: 16px;
 }
 .room-topline {
   display: flex;
@@ -481,8 +486,8 @@ small {
 }
 .room-meta {
   color: var(--muted);
-  font-size: 11px;
-  margin: 7px 0 16px;
+  font-size: 13px;
+  margin: 6px 0 12px;
 }
 .amenities {
   display: flex;
@@ -491,12 +496,13 @@ small {
   margin-bottom: 20px;
 }
 .amenity {
-  background: var(--surface-subtle);
-  border: 1px solid var(--line);
   color: var(--muted);
-  padding: 6px 8px;
-  border-radius: 5px;
-  font-size: 10px;
+  font-size: 12px;
+}
+.amenity + .amenity::before {
+  content: "·";
+  margin-right: 6px;
+  color: var(--muted);
 }
 .room-footer {
   display: flex;
@@ -562,7 +568,6 @@ small {
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--paper);
-  box-shadow: var(--shadow);
   padding: 23px;
 }
 .panel-title {
@@ -936,7 +941,9 @@ small {
   border-radius: 30px;
   position: relative;
   cursor: pointer;
-  transition: 0.2s;
+  transition:
+    background-color 160ms ease-out,
+    border-color 160ms ease-out;
 }
 .toggle:before {
   content: "";
@@ -947,7 +954,9 @@ small {
   height: 14px;
   background: var(--paper);
   border-radius: 50%;
-  transition: 0.2s;
+  transition:
+    background-color 160ms ease-out,
+    border-color 160ms ease-out;
 }
 .toggle:checked {
   background: var(--primary);
@@ -969,7 +978,9 @@ small {
   opacity: 0;
   pointer-events: none;
   transform: translateY(10px);
-  transition: 0.2s;
+  transition:
+    background-color 160ms ease-out,
+    border-color 160ms ease-out;
 }
 .toast.show {
   opacity: 1;
@@ -1073,12 +1084,6 @@ small {
   font-weight: 700;
 }
 @media (max-width: 1320px) {
-  .rooms-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .filter-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
   .editor-grid {
     grid-template-columns: 170px minmax(340px, 1fr);
   }
@@ -1093,37 +1098,8 @@ small {
   }
 }
 @media (max-width: 960px) {
-  .sidebar {
-    width: 70px;
-    padding: 26px 10px;
-  }
-  .brand {
-    padding: 0 9px 35px;
-  }
-  .brand > div,
-  .sidebar-label,
-  .nav-item:not(.active) {
-    font-size: 0;
-  }
-  .nav-item {
-    font-size: 0;
-    justify-content: center;
-    padding: 13px;
-  }
-  .nav-icon {
-    font-size: 21px;
-  }
-  .side-bottom {
-    display: none;
-  }
-  .main {
-    margin-left: 70px;
-  }
   .page {
-    padding: 30px 20px;
-  }
-  .topbar {
-    padding: 0 23px;
+    padding: 24px;
   }
   .detail-layout,
   .schedule-layout {
@@ -1137,12 +1113,6 @@ small {
   }
 }
 @media (max-width: 650px) {
-  .sidebar {
-    width: 58px;
-  }
-  .main {
-    margin-left: 58px;
-  }
   .topbar {
     height: 60px;
     padding: 0 12px;
@@ -1165,9 +1135,6 @@ small {
   }
   .filter-row2 {
     flex-wrap: wrap;
-  }
-  .room-art {
-    height: 210px;
   }
   .editor-stage {
     min-height: 350px;
@@ -1199,7 +1166,6 @@ small {
   width: min(420px, 100%);
   border: 1px solid var(--line-strong);
   border-radius: 16px;
-  box-shadow: var(--shadow);
 }
 .login-card h1 {
   font-size: 34px;
@@ -1243,64 +1209,6 @@ small {
     scroll-behavior: auto !important;
     transition: none !important;
     animation: none !important;
-  }
-}
-@media (max-width: 960px) {
-  .sidebar {
-    position: relative;
-    width: 100%;
-    padding: 12px 16px;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-  }
-  .sidebar .brand,
-  .sidebar .sidebar-label,
-  .sidebar .user-chip {
-    display: none;
-  }
-  .sidebar nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-  .sidebar .nav-item {
-    width: auto;
-    font-size: 12px;
-    padding: 10px;
-    gap: 7px;
-  }
-  .sidebar .nav-icon {
-    font-size: 16px;
-    width: 16px;
-  }
-  .sidebar .side-bottom {
-    display: block;
-    margin: 0 0 0 auto;
-  }
-  .sidebar .side-bottom > .button {
-    margin: 0;
-    padding: 9px;
-  }
-  .main {
-    margin-left: 0;
-  }
-  .topbar {
-    position: relative;
-  }
-  .field {
-    min-width: 0;
-  }
-  .field input,
-  .field select {
-    min-width: 0;
-    width: 100%;
-  }
-  .overview-bar {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 8px;
   }
 }
 .management-row {
@@ -1400,7 +1308,7 @@ small {
 }
 .catalog-layout {
   display: grid;
-  grid-template-columns: 230px 1fr;
+  grid-template-columns: 156px minmax(0, 1fr);
   gap: 20px;
   align-items: start;
 }
@@ -1408,6 +1316,10 @@ small {
   padding: 12px;
 }
 .tree-item {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   border: 0;
   background: none;
   color: var(--ink);
@@ -1594,9 +1506,9 @@ small {
   gap: 4px;
 }
 .view-switch .active {
-  background: var(--button-primary-bg);
-  border-color: var(--button-primary-bg);
-  color: var(--button-primary-text);
+  background: var(--primary-soft);
+  border-color: var(--primary-border);
+  color: var(--primary-text);
 }
 .room-card {
   display: block;
@@ -1614,11 +1526,16 @@ small {
   display: block;
 }
 .room-card .room-topline strong {
-  font-size: 17px;
+  font-size: 18px;
+  font-weight: 600;
 }
 .room-card .room-layout-type {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 8px;
   font-size: 12px;
-  margin: 10px 0;
+  margin: 8px 0;
   color: var(--muted);
 }
 .room-card .amenities {
@@ -1634,12 +1551,12 @@ small {
 .discovery-list-row {
   display: grid;
   grid-template-columns:
-    minmax(230px, 1.5fr) minmax(150px, 1fr)
-    70px 95px minmax(180px, 1.1fr) 95px;
+    minmax(190px, 1.5fr) minmax(120px, 1fr)
+    64px 80px minmax(120px, 1fr) 88px;
   gap: 16px;
   align-items: center;
   padding: 14px 20px;
-  min-width: 980px;
+  min-width: 780px;
 }
 .discovery-list-head {
   font-size: 12px;
@@ -1727,7 +1644,6 @@ small {
 }
 .room-dialog::backdrop {
   background: var(--overlay);
-  backdrop-filter: blur(3px);
 }
 .room-dialog-heading {
   display: flex;
@@ -1799,8 +1715,9 @@ small {
 .room-management-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 1050px;
-  font-size: 12px;
+  min-width: 800px;
+  table-layout: fixed;
+  font-size: 13px;
 }
 .room-management-table th {
   background: var(--surface-subtle);
@@ -1810,7 +1727,7 @@ small {
 }
 .room-management-table th,
 .room-management-table td {
-  padding: 14px 12px;
+  padding: 14px 8px;
   border-bottom: 1px solid var(--line);
   vertical-align: middle;
 }
@@ -1971,49 +1888,12 @@ small {
   color: var(--primary-text);
 }
 .catalog-layout {
-  grid-template-columns: 190px minmax(0, 1fr);
-}
-.room-management-table {
-  min-width: 820px;
-}
-.room-management-table th,
-.room-management-table td {
-  padding: 13px 10px;
-}
-.room-management-table td:nth-child(2) small {
-  max-width: 115px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.room-management-table td:nth-child(4),
-.room-management-table td:nth-child(5) {
-  white-space: nowrap;
+  grid-template-columns: 156px minmax(0, 1fr);
 }
 @media (max-width: 850px) {
   .catalog-layout {
     grid-template-columns: 1fr;
   }
-}
-.room-management-table {
-  table-layout: fixed;
-  min-width: 880px;
-}
-.room-management-table th {
-  white-space: nowrap;
-}
-.room-management-table td {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.room-management-table td:nth-child(7) {
-  white-space: normal;
-  overflow-wrap: anywhere;
-  line-height: 1.6;
-}
-.room-management-table td:last-child {
-  overflow: visible;
 }
 .layout-card-footer button:disabled {
   cursor: not-allowed;
@@ -2177,4 +2057,309 @@ textarea:disabled {
   color: var(--ink);
   font-size: 12px;
   font-weight: 600;
+}
+
+.header-location {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.navigation-toggle,
+.navigation-close {
+  display: none;
+}
+.filter-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+}
+.filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  border: 0;
+  padding: 0 4px;
+  background: transparent;
+  font-size: 13px;
+  white-space: nowrap;
+  color: var(--muted);
+}
+.filter-toggle:hover,
+.filter-toggle.active {
+  color: var(--primary-text);
+}
+.filter-toggle.active svg {
+  transform: rotate(180deg);
+}
+.filter-count {
+  min-width: 20px;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--primary-soft);
+  color: var(--primary-text);
+  font-variant-numeric: tabular-nums;
+}
+.filter-extra {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+.filter-locations {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 220px));
+  gap: 12px;
+}
+.field {
+  min-width: 0;
+}
+.field input,
+.field select {
+  min-width: 0;
+}
+.room-topline > span {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.room-rule {
+  color: var(--warning);
+}
+.room-management-table th,
+.room-management-table td {
+  overflow-wrap: anywhere;
+}
+.room-management-table td small {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.room-management-table th:last-child,
+.room-management-table td:last-child {
+  position: sticky;
+  right: 0;
+  background: var(--paper);
+  text-align: center;
+  padding: 12px 4px;
+}
+.room-management-table th:last-child {
+  background: var(--surface-subtle);
+}
+.room-management-table td:nth-child(2) {
+  position: sticky;
+  left: 0;
+  background: var(--paper);
+}
+.managed-rooms .table-scroll {
+  max-width: 100%;
+  border-radius: 0 0 12px 12px;
+}
+input,
+textarea {
+  caret-color: var(--primary-text);
+}
+input[type="date"],
+input[type="time"],
+.room-management-table,
+.room-status {
+  font-variant-numeric: tabular-nums;
+}
+::selection {
+  background: var(--primary-border);
+  color: var(--ink);
+}
+* {
+  scrollbar-color: var(--line-strong) transparent;
+  scrollbar-width: thin;
+}
+
+@media (max-width: 1180px) {
+  .rooms-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .filter-surface {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .filter-actions {
+    min-height: 32px;
+    justify-content: flex-end;
+  }
+}
+@media (max-width: 960px) {
+  .main {
+    margin-left: 0;
+  }
+  .topbar {
+    padding: 0 24px;
+    position: sticky;
+  }
+  .navigation-toggle,
+  .navigation-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--ink);
+  }
+  .navigation-toggle:hover,
+  .navigation-close:hover {
+    background: var(--sidebar-hover);
+  }
+  .sidebar {
+    visibility: hidden;
+    transform: translateX(-100%);
+    width: min(288px, calc(100vw - 48px));
+    padding-top: 24px;
+    z-index: 40;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .sidebar.navigation-open {
+    visibility: visible;
+    transform: none;
+  }
+  .navigation-close {
+    position: absolute;
+    right: 8px;
+    top: 12px;
+  }
+  .navigation-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    border: 0;
+    background: var(--overlay);
+    padding: 0;
+    cursor: default;
+  }
+  .side-bottom {
+    display: block;
+  }
+}
+@media (max-width: 650px) {
+  .page {
+    padding: 20px 16px 32px;
+  }
+  .topbar {
+    height: 60px;
+    padding: 0 12px 0 8px;
+  }
+  .header-location {
+    gap: 4px;
+  }
+  .breadcrumbs > span {
+    display: none;
+  }
+  #crumb {
+    font-size: 14px;
+  }
+  .header-right {
+    gap: 4px;
+  }
+  .header-right .button {
+    min-height: 44px;
+    padding: 8px;
+    font-size: 12px;
+  }
+  .filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .field label {
+    margin-bottom: 6px;
+  }
+  .field input,
+  .field select,
+  .filter-toggle,
+  .filter-actions .linklike,
+  .chip,
+  .view-switch .button {
+    min-height: 44px;
+  }
+  .filter-surface {
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+    gap: 4px;
+  }
+  .filter-actions {
+    justify-content: space-between;
+  }
+  .filter-locations {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .results-toolbar {
+    margin: 0 0 12px;
+  }
+  .rooms-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .room-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 112px;
+    align-items: stretch;
+  }
+  .room-card .room-art {
+    grid-column: 2;
+    grid-row: 1;
+    height: 100%;
+    min-height: 156px;
+    padding: 4px;
+    border-radius: 0;
+  }
+  .room-card .room-info {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 16px 12px;
+    min-width: 0;
+  }
+  .room-card .room-art svg {
+    min-height: 156px;
+  }
+  .room-card .art-status {
+    top: 8px;
+    right: 6px;
+    padding: 3px 5px;
+    font-size: 10px;
+  }
+  .room-card .room-topline {
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .room-card .room-meta {
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+  .room-card .room-layout-type {
+    justify-content: flex-start;
+  }
+  .room-card .room-rule {
+    width: 100%;
+  }
+  .room-dialog {
+    width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px);
+    padding: 16px;
+  }
+  .room-dialog-heading {
+    margin-bottom: 16px;
+  }
+  .room-dialog .icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+  .room-detail-layout {
+    gap: 20px;
+  }
+  .detail-facts {
+    gap: 12px;
+  }
 }
