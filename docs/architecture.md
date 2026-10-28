@@ -19,6 +19,7 @@
 - `access.ts`：可见、可订和个人拒绝规则。
 - `reservations.ts`、`booking-edits.ts`、`recurrence.ts`：创建、周期展开、修改和状态处理。
 - `layouts.ts`、`template-choice.ts`：共享布局、版本和房间布局选择。
+- `room-search.ts`、`room-search-rules.ts`：模型语义解析、硬约束合并与实时空闲推荐。
 - `calendar.ts`、`room-bookings.ts`：资源日程、会议室预订记录的日期筛选与分页。
 - `booking-view.ts`：各预订接口共用的隐私过滤。
 - `mail.ts`：邮件队列消费与重试。
@@ -102,6 +103,7 @@ bookings 1—N notifications 1—1 email_outbox
 | 空间 | `/api/buildings`、`/api/floors`、`/api/rooms`、`/api/rooms/bulk` |
 | 布局 | `/api/layout-templates` 及其版本接口 |
 | 会议室预订记录 | `/api/rooms/:id/bookings?from=日期&to=日期&page=页码` |
+| 智能找房 | `POST /api/room-search`，携带当前筛选；附带 `messages` 时先调用模型解析 |
 | 预订 | `/api/bookings/preview`、`/api/bookings`、`/api/bookings/:id` |
 | 状态与系列 | `/api/bookings/:id/:action`、`/api/series/:id/:action` |
 | 通知与审计 | `/api/notifications`、`/api/audit` |

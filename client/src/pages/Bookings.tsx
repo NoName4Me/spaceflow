@@ -1,15 +1,25 @@
 import { useCallback, useRef, useState } from "react";
-import { json, message } from "../api";
+import {
+  RoomSuggestions,
+  type RoomSearchResult,
+} from "../components/RoomSearch";
+import { ApiError, json, message } from "../api";
 import { statusLabels, today, value } from "../model";
 import { useWorkspace } from "../workspace";
 import { Field, Select, Empty, Tools } from "../components/ui";
 import { useDialogFocus } from "../components/useDialogFocus";
 import type { Booking, Directory, Room } from "../types";
-export type BookRoom = (room: Room, start?: string, date?: string) => void;
+export type BookRoom = (
+  room: Room,
+  start?: string,
+  date?: string,
+  end?: string,
+) => void;
 export type EditBooking = (booking: Booking, patch?: Partial<Booking>) => void;
 interface BookingDraft {
   room: Room;
   start?: string;
+  end?: string;
   date: string;
   directory: Directory;
 }
@@ -17,7 +27,7 @@ export function useBookingActions() {
   const { data, filters, request, setDialog, run } = useWorkspace();
   const [booking, setBooking] = useState<BookingDraft | null>(null);
   const close = useCallback(() => setBooking(null), []);
-  const open: BookRoom = (room, start, date) => {
+  const open: BookRoom = (room, start, date, end) => {
     void run(async () => {
       if (!data) return;
       if (
@@ -30,7 +40,7 @@ export function useBookingActions() {
         data.user.role === "admin"
           ? await request<Directory>("/admin/directory")
           : { users: [], departments: [] };
-      setBooking({ room, start, date: date || filters.date, directory });
+      setBooking({ room, start, end, date: date || filters.date, directory });
     });
   };
   const edit: EditBooking = (b, patch = {}) => {
@@ -154,14 +164,20 @@ export function BookingForm({
     [error, setError] = useState(""),
     [conflicts, setConflicts] = useState<string[]>([]),
     [skip, setSkip] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(draft.room);
+  const [alternatives, setAlternatives] = useState<RoomSearchResult | null>(
+    null,
+  );
   const reviewed = useRef({ dates: [] as string[], window: "" });
   const ref = useRef<HTMLDivElement>(null);
   useDialogFocus(ref, close);
-  const r = draft.room,
+  const r = selectedRoom,
     first = draft.start || filters.start,
-    end = draft.start
-      ? `${String(Math.min(23, Number(first.slice(0, 2)) + 1)).padStart(2, "0")}:00`
-      : filters.end;
+    end =
+      draft.end ||
+      (draft.start
+        ? `${String(Math.min(23, Number(first.slice(0, 2)) + 1)).padStart(2, "0")}:00`
+        : filters.end);
   if (!data) return null;
   return (
     <div ref={ref}>
@@ -179,12 +195,20 @@ export function BookingForm({
       <div id="modalBody">
         <form
           id="bookingForm"
+          onChange={() => setAlternatives(null)}
           onSubmit={async (e) => {
             e.preventDefault();
             if (busy) return;
             const f = new FormData(e.currentTarget);
             setBusy(true);
             setError("");
+            setAlternatives(null);
+            let hasConflict = false;
+            let singleWindow: {
+              date: string;
+              start: string;
+              end: string;
+            } | null = null;
             try {
               const frequency = value(f, "frequency");
               const repeat =
@@ -211,6 +235,12 @@ export function BookingForm({
                 ...(repeat ? { repeat } : {}),
                 ...(f.get("userId") ? { userId: value(f, "userId") } : {}),
               };
+              if (!repeat)
+                singleWindow = {
+                  date: payload.date,
+                  start: payload.start,
+                  end: payload.end,
+                };
               const preview = await request<{ conflicts: string[] }>(
                 "/bookings/preview",
                 json(payload),
@@ -230,6 +260,7 @@ export function BookingForm({
                     reviewed.current.dates.includes(d),
                   ))
               ) {
+                hasConflict = true;
                 reviewed.current = { dates: preview.conflicts, window };
                 setConflicts(repeat ? preview.conflicts : []);
                 setSkip(false);
@@ -250,6 +281,25 @@ export function BookingForm({
               notify(r.rule === "approval" ? "已提交审批" : "预订成功");
             } catch (error) {
               setError(message(error));
+              if (
+                singleWindow &&
+                ((error instanceof ApiError && error.status === 409) ||
+                  hasConflict)
+              ) {
+                try {
+                  const result = await request<RoomSearchResult>(
+                    "/room-search",
+                    json({
+                      filters: { ...filters, ...singleWindow },
+                    }),
+                  );
+                  setAlternatives(result);
+                } catch (searchError) {
+                  setError(
+                    message(error) + "；替代查找失败：" + message(searchError),
+                  );
+                }
+              }
             } finally {
               setBusy(false);
             }
@@ -403,6 +453,23 @@ export function BookingForm({
             >
               {error}
             </div>
+            {alternatives && (
+              <div className="full-row">
+                <RoomSuggestions
+                  result={alternatives}
+                  onChoose={(s) => {
+                    const next = data.rooms.find(
+                      (room) => room.id === s.roomId,
+                    );
+                    if (!next) return;
+                    setSelectedRoom(next);
+                    setAlternatives(null);
+                    setError("");
+                    reviewed.current = { dates: [], window: "" };
+                  }}
+                />
+              </div>
+            )}
             <label
               className="checkbox-row full-row"
               id="skipConflictRow"

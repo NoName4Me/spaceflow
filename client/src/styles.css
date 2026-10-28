@@ -2363,3 +2363,61 @@ input[type="time"],
     gap: 12px;
   }
 }
+
+.smart-search {
+  margin-bottom: 20px;
+}
+.smart-search-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.smart-search-form input {
+  flex: 1;
+  min-width: 0;
+}
+.smart-search-form .button {
+  flex-shrink: 0;
+}
+.room-suggestions {
+  margin-top: 14px;
+}
+.room-suggestions p {
+  margin: 0 0 10px;
+}
+.room-suggestions ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.room-suggestions li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.suggestion-info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.suggestion-info small {
+  flex-basis: 100%;
+}
+@media (max-width: 600px) {
+  .smart-search-form {
+    flex-wrap: wrap;
+  }
+  .smart-search-form input {
+    flex-basis: 100%;
+  }
+  .suggestion-info {
+    display: grid;
+    gap: 4px;
+  }
+}

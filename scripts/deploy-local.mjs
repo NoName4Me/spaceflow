@@ -5,7 +5,7 @@ const url = new URL(process.env.DATABASE_URL);
 url.hostname = "postgres";
 writeFileSync(
   ".env.container",
-  `CONTAINER_DATABASE_URL=${url}\nTLS_UID=${process.getuid()}\nTLS_GID=${process.getgid()}\nAPP_ORIGIN=${process.env.APP_ORIGIN || "http://127.0.0.1:3080"}\nADDITIONAL_ORIGINS=https://localhost:3443,https://127.0.0.1:3443\nCONTAINER_SMTP_URL=${process.env.CONTAINER_SMTP_URL || ""}\nMAIL_FROM=${process.env.MAIL_FROM || "Spaceflow <spaceflow@localhost>"}\n`,
+  `CONTAINER_DATABASE_URL=${url}\nTLS_UID=${process.getuid()}\nTLS_GID=${process.getgid()}\nAPP_ORIGIN=${process.env.APP_ORIGIN || "http://127.0.0.1:3080"}\nADDITIONAL_ORIGINS=https://localhost:3443,https://127.0.0.1:3443\nCONTAINER_SMTP_URL=${process.env.CONTAINER_SMTP_URL || ""}\nMAIL_FROM=${process.env.MAIL_FROM || "Spaceflow <spaceflow@localhost>"}\nAI_BASE_URL=${JSON.stringify(process.env.AI_BASE_URL || "https://api.openai.com/v1")}\nAI_API_KEY=${JSON.stringify(process.env.AI_API_KEY || "")}\nAI_MODEL=${JSON.stringify(process.env.AI_MODEL || "")}\n`,
   { mode: 0o600 },
 );
 const run = (cmd, args) => {

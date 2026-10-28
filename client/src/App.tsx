@@ -319,7 +319,9 @@ export function App() {
               </div>
             </header>
             <div id="content">
-              {page === "explore" && <Discovery onDetail={showDetail} />}
+              {page === "explore" && (
+                <Discovery onDetail={showDetail} onBook={booking.open} />
+              )}
               {page === "schedule" && (
                 <Schedule
                   onBook={booking.open}

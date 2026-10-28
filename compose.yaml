@@ -17,6 +17,9 @@ services:
       PORT: 3080
       APP_ORIGIN: ${APP_ORIGIN:-http://127.0.0.1:3080}
       ADDITIONAL_ORIGINS: ${ADDITIONAL_ORIGINS:-}
+      AI_BASE_URL: ${AI_BASE_URL:-https://api.openai.com/v1}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_MODEL: ${AI_MODEL:-}
       SMTP_URL: ${CONTAINER_SMTP_URL:-}
       MAIL_FROM: ${MAIL_FROM:-Spaceflow <spaceflow@localhost>}
     ports:

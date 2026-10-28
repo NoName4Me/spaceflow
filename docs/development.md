@@ -63,10 +63,14 @@ npm start
 | `SMTP_URL` | 本机后端的 SMTP 地址 |
 | `CONTAINER_SMTP_URL` | 应用容器能访问的 SMTP 地址 |
 | `MAIL_FROM` | 邮件发件地址 |
+| `AI_BASE_URL` | 兼容 OpenAI 的接口根地址，包含服务商要求的 `/v1` 等路径，默认 `https://api.openai.com/v1` |
+| `AI_API_KEY`、`AI_MODEL` | 模型密钥和模型名；两项均配置后启用语义理解 |
 
 未配置 SMTP 时只使用站内通知。配置后重新启动或部署，并在账号设置中维护通知邮箱。容器内 `localhost` 指向容器本身，连接地址须从容器可达。
 
 `.env`、`.env.container`、`.local-accounts`、`.tls/`、`backups/` 不进入版本控制。
+
+模型服务配置写入本地 `.env`，重新启动或部署后生效；部署脚本会传入应用容器。服务需支持 `/chat/completions` 和 `response_format: {"type":"json_object"}`（[接口格式](https://developers.openai.com/api/docs/guides/structured-outputs)）。密钥仅在服务端使用。
 
 ## 迁移、备份与恢复验证
 

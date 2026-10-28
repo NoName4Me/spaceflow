@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { RoomSearch } from "../components/RoomSearch";
 import { Plan } from "../components/Plan";
 import { Empty } from "../components/ui";
 import { companyDate } from "../booking-dates";
@@ -25,7 +26,13 @@ export function Facilities({ room }: { room: Room }) {
     </>
   );
 }
-export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
+export function Discovery({
+  onDetail,
+  onBook,
+}: {
+  onDetail: (id: string) => void;
+  onBook: BookRoom;
+}) {
   const { data, filters: f, setFilters } = useWorkspace();
   const [view, setView] = useState(() => {
     try {
@@ -66,6 +73,7 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
           : "时段占用";
   return (
     <section className="page discovery-page">
+      <RoomSearch onBook={onBook} />
       <div className="filter-surface">
         <div className="filter-grid">
           <div className="field">
@@ -89,11 +97,23 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
               }
             >
               <option value="0">不限</option>
-              {[4, 6, 8, 12, 16, 20].map((n) => (
-                <option value={n} key={n}>
-                  {n} 人以上
-                </option>
-              ))}
+              {[
+                ...new Set([
+                  4,
+                  6,
+                  8,
+                  12,
+                  16,
+                  20,
+                  ...(f.capacity ? [f.capacity] : []),
+                ]),
+              ]
+                .sort((a, b) => a - b)
+                .map((n) => (
+                  <option value={n} key={n}>
+                    {n} 人以上
+                  </option>
+                ))}
             </select>
           </div>
           <div className="field">
@@ -169,7 +189,12 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
                 }
               >
                 <option value="all">全部楼栋</option>
-                {buildings.map((b) => (
+                {[
+                  ...new Set([
+                    ...buildings,
+                    ...(f.building !== "all" ? [f.building] : []),
+                  ]),
+                ].map((b) => (
                   <option key={b}>{b}</option>
                 ))}
               </select>
@@ -182,30 +207,37 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
                 onChange={(e) => setFilters({ ...f, floor: e.target.value })}
               >
                 <option value="all">全部楼层</option>
-                {floors.map((f) => (
+                {[
+                  ...new Set([
+                    ...floors,
+                    ...(f.floor !== "all" ? [f.floor] : []),
+                  ]),
+                ].map((f) => (
                   <option key={f}>{f}</option>
                 ))}
               </select>
             </div>
           </div>
           <div className="filter-row2">
-            {["投屏", "视频会议", "白板", "音响"].map((e) => (
-              <button
-                key={e}
-                className={`chip ${f.equip.includes(e) ? "on" : ""}`}
-                aria-pressed={f.equip.includes(e)}
-                onClick={() =>
-                  setFilters({
-                    ...f,
-                    equip: f.equip.includes(e)
-                      ? f.equip.filter((v) => v !== e)
-                      : [...f.equip, e],
-                  })
-                }
-              >
-                {e}
-              </button>
-            ))}
+            {[...new Set(["投屏", "视频会议", "白板", "音响", ...f.equip])].map(
+              (e) => (
+                <button
+                  key={e}
+                  className={`chip ${f.equip.includes(e) ? "on" : ""}`}
+                  aria-pressed={f.equip.includes(e)}
+                  onClick={() =>
+                    setFilters({
+                      ...f,
+                      equip: f.equip.includes(e)
+                        ? f.equip.filter((v) => v !== e)
+                        : [...f.equip, e],
+                    })
+                  }
+                >
+                  {e}
+                </button>
+              ),
+            )}
           </div>
         </div>
       </div>
