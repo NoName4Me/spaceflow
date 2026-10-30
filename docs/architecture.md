@@ -19,7 +19,7 @@
 - `access.ts`：可见、可订和个人拒绝规则。
 - `reservations.ts`、`booking-edits.ts`、`recurrence.ts`：创建、周期展开、修改和状态处理。
 - `layouts.ts`、`template-choice.ts`：共享布局、版本和房间布局选择。
-- `room-search.ts`、`room-search-rules.ts`：模型语义解析、硬约束合并与实时空闲推荐。
+- `room-search.ts`、`room-search-rules.ts`：连续对话解析、交互字段、确认条件合并与实时空闲推荐。
 - `calendar.ts`、`room-bookings.ts`：资源日程、会议室预订记录的日期筛选与分页。
 - `booking-view.ts`：各预订接口共用的隐私过滤。
 - `mail.ts`：邮件队列消费与重试。
@@ -31,6 +31,7 @@
 - `pages/`：发现、日程、预订、会议室、布局和账号管理。
 - `components/`：表单字段、焦点管理、批量选择和声明式 SVG 组件。
 - `api.ts`、`types.ts`：请求处理、错误类型和业务数据接口。
+- `components/Assistant.tsx`：全局对话抽屉、条件组件及按账号保存的浏览器历史；新对话使用独立条件。
 - `workspace.tsx`：会话、服务端快照、通知及跨页筛选；页面请求通过 AbortController 取消过期结果。布局草稿、选择、撤销、表单和列表选择保存在对应组件内。
 - `theme.css`：基础色、用途及组件变量；页面与 SVG 共用，颜色不进入业务数据。
 
@@ -103,7 +104,7 @@ bookings 1—N notifications 1—1 email_outbox
 | 空间 | `/api/buildings`、`/api/floors`、`/api/rooms`、`/api/rooms/bulk` |
 | 布局 | `/api/layout-templates` 及其版本接口 |
 | 会议室预订记录 | `/api/rooms/:id/bookings?from=日期&to=日期&page=页码` |
-| 智能找房 | `POST /api/room-search`，携带当前筛选；附带 `messages` 时先调用模型解析 |
+| 智能找房 | `POST /api/room-search`，携带本对话条件；`conversation` 提供角色消息历史，`answers` 提供组件批量确认值；兼容旧 `messages` 请求 |
 | 预订 | `/api/bookings/preview`、`/api/bookings`、`/api/bookings/:id` |
 | 状态与系列 | `/api/bookings/:id/:action`、`/api/series/:id/:action` |
 | 通知与审计 | `/api/notifications`、`/api/audit` |

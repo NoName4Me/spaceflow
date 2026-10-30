@@ -13,6 +13,15 @@ export const searchFiltersSchema = z
   })
   .strict();
 export type SearchFilters = z.infer<typeof searchFiltersSchema>;
+export const assistantFields = z.enum([
+  "date",
+  "start",
+  "end",
+  "capacity",
+  "equip",
+  "building",
+  "floor",
+]);
 export const intentSchema = z
   .object({
     date: z.iso.date().nullable(),
@@ -24,12 +33,14 @@ export const intentSchema = z
     equip: z.array(name).max(30),
     preferredBuilding: name.nullable(),
     question: z.string().trim().max(300).nullable(),
+    action: z.enum(["ask", "search", "reply"]).optional(),
+    reply: z.string().trim().max(1200).optional(),
+    fields: z.array(assistantFields).max(7).optional(),
   })
   .strict();
 export type SearchIntent = z.infer<typeof intentSchema>;
 // Selected requirements are hard constraints; language can add but never relax them.
 export function mergeIntent(base: SearchFilters, intent: SearchIntent) {
-  if (intent.question) return { filters: base, question: intent.question };
   for (const field of ["building", "floor"] as const) {
     if (base[field] !== "all" && intent[field] && base[field] !== intent[field])
       return {
@@ -49,7 +60,7 @@ export function mergeIntent(base: SearchFilters, intent: SearchIntent) {
       floor: base.floor !== "all" ? base.floor : (intent.floor ?? "all"),
       equip: [...new Set([...base.equip, ...intent.equip])],
     }),
-    question: null,
+    question: intent.question,
   };
 }
 export function matchesRequirements(

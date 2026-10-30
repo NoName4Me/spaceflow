@@ -5,6 +5,7 @@ import {
   useState,
   type RefObject,
 } from "react";
+import { Assistant, AssistantButton } from "./components/Assistant";
 import { json, message } from "./api";
 import { EditModal, Empty } from "./components/ui";
 import {
@@ -134,6 +135,11 @@ export function App() {
   } = useWorkspace();
   const booking = useBookingActions(),
     [detail, setDetail] = useState<string | null>(null);
+  const [assistantOpen, setAssistantOpen] = useState(false);
+  const closeAssistant = useCallback(() => {
+    setAssistantOpen(false);
+    document.querySelector<HTMLButtonElement>(".assistant-trigger")?.focus();
+  }, []);
   const [navigationOpen, setNavigationOpen] = useState(false);
   const navigationPanel = useRef<HTMLElement>(null);
   const closeNavigation = useCallback(() => setNavigationOpen(false), []);
@@ -167,8 +173,9 @@ export function App() {
       closeDetail();
       booking.close();
       closeNavigation();
+      closeAssistant();
     }
-  }, [data, closeDetail, booking.close, closeNavigation]);
+  }, [data, closeDetail, booking.close, closeNavigation, closeAssistant]);
   const showDetail = (id: string) =>
     void run(async () => {
       const current = await refresh();
@@ -205,7 +212,7 @@ export function App() {
       ) : !data ? (
         <Login />
       ) : (
-        <div id="app">
+        <div id="app" className={assistantOpen ? "assistant-open" : undefined}>
           {navigationOpen && (
             <NavigationFocus panel={navigationPanel} close={closeNavigation} />
           )}
@@ -302,6 +309,13 @@ export function App() {
                 </div>
               </div>
               <div className="header-right">
+                <AssistantButton
+                  open={assistantOpen}
+                  onClick={() => {
+                    closeNavigation();
+                    setAssistantOpen(!assistantOpen);
+                  }}
+                />
                 <button
                   className="button small"
                   id="notificationButton"
@@ -319,9 +333,7 @@ export function App() {
               </div>
             </header>
             <div id="content">
-              {page === "explore" && (
-                <Discovery onDetail={showDetail} onBook={booking.open} />
-              )}
+              {page === "explore" && <Discovery onDetail={showDetail} />}
               {page === "schedule" && (
                 <Schedule
                   onBook={booking.open}
@@ -347,6 +359,13 @@ export function App() {
               {page === "notifications" && <Notifications />}
             </div>
           </main>
+          <Assistant
+            key={data.user.id}
+            userId={data.user.id}
+            open={assistantOpen}
+            onClose={closeAssistant}
+            onBook={booking.open}
+          />
           <div
             className={`modal-backdrop ${dialog || booking.booking ? "open" : ""}`}
             id="modal"

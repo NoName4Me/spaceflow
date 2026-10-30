@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { RoomSearch } from "../components/RoomSearch";
 import { Plan } from "../components/Plan";
 import { Empty } from "../components/ui";
 import { companyDate } from "../booking-dates";
@@ -26,13 +25,7 @@ export function Facilities({ room }: { room: Room }) {
     </>
   );
 }
-export function Discovery({
-  onDetail,
-  onBook,
-}: {
-  onDetail: (id: string) => void;
-  onBook: BookRoom;
-}) {
+export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
   const { data, filters: f, setFilters } = useWorkspace();
   const [view, setView] = useState(() => {
     try {
@@ -73,7 +66,6 @@ export function Discovery({
           : "时段占用";
   return (
     <section className="page discovery-page">
-      <RoomSearch onBook={onBook} />
       <div className="filter-surface">
         <div className="filter-grid">
           <div className="field">
