@@ -13,7 +13,7 @@ const base="http://127.0.0.1:"+addr.port+"/api";
 async function req(path:string,token="",method="GET",body?:unknown){const r=await fetch(base+path,{method,headers:{"Content-Type":"application/json",Cookie:token},...(body?{body:JSON.stringify(body)}:{})});return {status:r.status,data:await r.json(),cookie:r.headers.get("set-cookie")?.split(";")[0]||""};}
 before(async()=>{
  const password="Workplace-test-1234",hash=await hashPassword(password);
- for(const [id,role] of [[adminId,"admin"],[memberId,"member"]]){await pool.query("INSERT INTO users(id,username,name,password_hash,role) VALUES($1,$1,$2,$3,$2)",[id,role,hash]);const r=await req("/login","","POST",{username:id,password});if(role==="admin")admin=r.cookie;else member=r.cookie;}
+ for(const [id,role] of [[adminId,"admin"],[memberId,"member"]]){await pool.query("INSERT INTO users(id,username,name,password_hash,role) VALUES($1,$2,$3,$4,$5)",[id,id,role,hash,role]);const r=await req("/login","","POST",{username:id,password});if(role==="admin")admin=r.cookie;else member=r.cookie;}
  await pool.query("INSERT INTO campuses(id,name) VALUES($1,$2)",[campusId,campusId]);
  await pool.query("INSERT INTO buildings(id,name,campus_id) VALUES($1,$2,$3)",[buildingId,buildingId,campusId]);
  await pool.query("INSERT INTO floors(id,building_id,name) VALUES($1,$2,'1F')",[floorId,buildingId]);
