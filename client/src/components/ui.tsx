@@ -74,7 +74,7 @@ export function EditModal() {
   return (
     <div>
       <div className="modal-top">
-        <DialogTitle id="modalTitle">{dialog.title}</DialogTitle>
+        <DialogTitle><span id="modalTitle">{dialog.title}</span></DialogTitle>
         <AppButton
           className="icon-btn"
           id="closeModal"

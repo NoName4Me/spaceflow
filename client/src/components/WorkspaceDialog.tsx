@@ -11,7 +11,6 @@ export function WorkspaceDialog({open,onClose,children,detail=false}:{open:boole
      overlayClassName="modal-backdrop open sf-dialog-overlay"
      overlayId={detail?undefined:"modal"}
      showCloseButton={false}
-     aria-labelledby={detail?"roomDetailTitle":"modalTitle"}
      aria-describedby={undefined}
      onOpenAutoFocus={e=>{
        opener.current=document.activeElement instanceof HTMLElement?document.activeElement:null;

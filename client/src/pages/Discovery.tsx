@@ -366,7 +366,7 @@ export function RoomDetail({
   return (
     <WorkspaceDialog open onClose={close} detail>
       <div className="room-dialog-heading">
-        <DialogTitle id="roomDetailTitle">{room.name}</DialogTitle>
+        <DialogTitle><span id="roomDetailTitle">{room.name}</span></DialogTitle>
         <AppButton
           className="icon-btn"
           id="closeRoomDetail"

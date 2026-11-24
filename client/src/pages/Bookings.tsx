@@ -181,7 +181,7 @@ export function BookingForm({
   return (
     <div>
       <div className="modal-top">
-        <DialogTitle id="modalTitle">预订会议室</DialogTitle>
+        <DialogTitle><span id="modalTitle">预订会议室</span></DialogTitle>
         <AppButton
           className="icon-btn"
           id="closeModal"
