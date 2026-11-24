@@ -46,6 +46,14 @@ try{
  await expect(page.getByRole("button",{name:"编辑布局",exact:true})).toBeVisible();
  await expect(page.getByRole("button",{name:"部门",exact:true})).toBeVisible();
  await page.getByRole("button",{name:"部门",exact:true}).click();
+ await page.getByRole("button",{name:"部门统计",exact:true}).click();
+ await expect(page.locator(".sf-report tbody")).toContainText("技术部-"+tag);
+ await expect(page.locator(".sf-report tbody")).toContainText("24");
+ await page.getByRole("button",{name:"部门统计",exact:true}).click();
+ await page.locator(".sf-list").filter({hasText:"D-001"}).click();
+ await page.getByRole("button",{name:"查看分配历史",exact:true}).click();
+ await expect(page.locator(".sf-desk-history")).toContainText("空间验收员工");
+ await page.getByRole("button",{name:"收起分配历史",exact:true}).click();
  await page.getByLabel("全园区搜索",{exact:true}).fill("空间验收员工");
  await expect(page.locator(".sf-search-results")).toContainText("空间验收员工");
  await page.getByRole("button",{name:"关闭搜索",exact:true}).click();

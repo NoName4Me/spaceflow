@@ -135,3 +135,35 @@ planning.post("/transfers",async(req,res)=>{
  return {floors:changes};
  });res.json(result);
 });
+
+planning.get("/department-summary",async(req,res)=>{
+ const q=z.object({campusId:z.uuid(),buildingId:z.uuid().optional(),floorId:z.uuid().optional()}).parse(req.query);
+ const rows=(await pool.query(`WITH resources AS (
+ SELECT o->>'kind' AS kind,explicit.id AS explicit_department,u.id AS user_id,u.department_id AS person_department,coalesce(explicit.id,u.department_id) AS department_id
+ FROM floor_scenes s JOIN floors f ON f.id=s.floor_id JOIN buildings b ON b.id=f.building_id
+ CROSS JOIN LATERAL jsonb_array_elements(s.objects) o
+ LEFT JOIN users u ON u.id::text=o->>'userId' AND u.active
+ LEFT JOIN departments explicit ON explicit.id::text=o->>'departmentId'
+ WHERE b.campus_id=$1 AND ($2::uuid IS NULL OR b.id=$2) AND ($3::uuid IS NULL OR f.id=$3) AND o->>'kind' IN ('desk','zone')
+ )
+ SELECT r.department_id,coalesce(d.name,'未归属部门') AS department_name,
+ count(*) FILTER(WHERE kind='desk')::int AS desks,
+ count(*) FILTER(WHERE kind='desk' AND user_id IS NOT NULL)::int AS assigned,
+ count(*) FILTER(WHERE kind='desk' AND explicit_department IS NOT NULL)::int AS reserved,
+ count(*) FILTER(WHERE kind='zone')::int AS zones,
+ count(*) FILTER(WHERE kind='desk' AND user_id IS NOT NULL AND explicit_department IS NOT NULL AND person_department IS NOT NULL AND person_department<>explicit_department)::int AS cross_department
+ FROM resources r LEFT JOIN departments d ON d.id=r.department_id GROUP BY r.department_id,d.name ORDER BY d.name NULLS LAST`,[q.campusId,q.buildingId??null,q.floorId??null])).rows;
+ res.json(rows);
+});
+planning.get("/floors/:id/desks/:desk/history",async(req,res)=>{
+ const id=z.uuid().parse(req.params.id),desk=z.uuid().parse(req.params.desk);
+ const rows=(await pool.query(`WITH snapshots AS (
+ SELECT v.revision,v.created_at,v.actor,o->>'name' AS desk_name,o->>'userId' AS user_id
+ FROM floor_scene_versions v LEFT JOIN LATERAL (SELECT item AS o FROM jsonb_array_elements(v.objects) item WHERE item->>'id'=$2 AND item->>'kind'='desk' LIMIT 1) x ON true
+ WHERE v.floor_id=$1
+ ), changes AS (SELECT *,lag(user_id) OVER(ORDER BY revision) AS previous_user_id FROM snapshots)
+ SELECT c.revision,c.created_at,a.name AS actor,c.desk_name,c.previous_user_id,p.name AS previous_name,c.user_id,u.name AS user_name
+ FROM changes c LEFT JOIN users a ON a.id=c.actor LEFT JOIN users p ON p.id::text=c.previous_user_id LEFT JOIN users u ON u.id::text=c.user_id
+ WHERE c.user_id IS DISTINCT FROM c.previous_user_id ORDER BY c.revision DESC LIMIT 100`,[id,desk])).rows;
+ res.json(rows);
+});

@@ -95,3 +95,25 @@ test("campus map updates geometry and checks revision",async()=>{
  assert.equal(c.campuses.find((x:any)=>x.id===campusId).map_objects[0].kind,"garden");
  assert.equal(c.buildings.find((x:any)=>x.id===buildingId).map_width,25);
 });
+
+test("department reports and desk assignment history are administrator-only and scoped",async()=>{
+ const department=randomUUID(),scenePath="/workplace/floors/"+floorId;
+ await pool.query("INSERT INTO departments(id,name) VALUES($1,$2)",[department,"Dept-"+department]);
+ try{
+ await pool.query("UPDATE users SET department_id=$1 WHERE id=$2",[department,memberId]);
+ const pub=(await req(scenePath,admin)).data;
+ const desk=pub.objects.find((o:any)=>o.kind==="desk");
+ const objects=pub.objects.map((o:any)=>o.kind==="desk"||o.kind==="zone"?{...o,departmentId:department}:o);
+ const path="/workplace/planning/floors/"+floorId;
+ assert.equal((await req(path+"/draft",admin,"PUT",{baseRevision:pub.revision,draftRevision:0,objects,referenceImage:null})).status,200);
+ assert.equal((await req(path+"/publish",admin,"POST",{draftRevision:1})).status,200);
+ const report="/workplace/planning/department-summary?campusId="+campusId+"&floorId="+floorId;
+ assert.equal((await req(report,member)).status,403);
+ const rows=(await req(report,admin)).data;
+ assert.equal(rows.length,1);assert.equal(rows[0].department_id,department);assert.equal(rows[0].desks,1);assert.equal(rows[0].reserved,1);assert.equal(rows[0].zones,1);
+ const history=path+"/desks/"+desk.id+"/history";
+ assert.equal((await req(history,member)).status,403);
+ const h=(await req(history,admin)).data;
+ assert.equal(h.length,2);assert.equal(h[0].previous_user_id,memberId);assert.equal(h[0].user_id,null);assert.equal(h[1].user_id,memberId);
+ }finally{await pool.query("UPDATE users SET department_id=NULL WHERE id=$1",[memberId]);await pool.query("DELETE FROM departments WHERE id=$1",[department]);}
+});

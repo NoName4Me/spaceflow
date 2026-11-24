@@ -26,6 +26,11 @@ function useWorkspaceState() {
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const session = useRef(0);
   const refreshRequest = useRef(0);
+  const navigationGuard = useRef<(() => boolean) | null>(null);
+  const registerNavigationGuard = useCallback((guard: () => boolean) => {
+    navigationGuard.current = guard;
+    return () => { if (navigationGuard.current === guard) navigationGuard.current = null; };
+  }, []);
   const notify = useCallback((text: string) => {
     setToast(text);
     clearTimeout(timer.current);
@@ -81,6 +86,7 @@ function useWorkspaceState() {
     }
   };
   const navigate = (next: Page) => {
+    if (next !== page && navigationGuard.current && !navigationGuard.current()) return;
     setPage(next);
     window.scrollTo({ top: 0 });
   };
@@ -89,6 +95,7 @@ function useWorkspaceState() {
     loading,
     page,
     navigate,
+    registerNavigationGuard,
     filters,
     setFilters,
     revision,
