@@ -17,6 +17,7 @@ import {
 } from "./pages/Management";
 import { BookingForm, Bookings, useBookingActions } from "./pages/Bookings";
 import { Discovery, RoomDetail } from "./pages/Discovery";
+import { Workplace } from "./pages/Workplace";
 import { Layouts } from "./pages/Layouts";
 import { Rooms } from "./pages/Rooms";
 import { Schedule } from "./pages/Schedule";
@@ -25,7 +26,8 @@ import { NavIcon } from "./components/NavIcon";
 import { useWorkspace } from "./workspace";
 import type { Page } from "./types";
 const titles: Record<Page, string> = {
-  explore: "空间发现",
+  workplace: "办公空间",
+  explore: "会议室发现",
   schedule: "预订日程",
   mine: "我的预订",
   rooms: "会议室管理",
@@ -252,7 +254,7 @@ export function App() {
               </div>
             </div>
             <div className="sidebar-label">预订</div>
-            <nav id="mainnav">{menu(nav.slice(0, 3))}</nav>
+            <nav id="mainnav">{menu(["workplace", ...nav.slice(0, 3)])}</nav>
             <div
               className="sidebar-label admin-label admin-only"
               hidden={!admin}
@@ -333,6 +335,7 @@ export function App() {
               </div>
             </header>
             <div id="content">
+              {page === "workplace" && <Workplace onDetail={showDetail} />}
               {page === "explore" && <Discovery onDetail={showDetail} />}
               {page === "schedule" && (
                 <Schedule

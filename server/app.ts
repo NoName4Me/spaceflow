@@ -1,3 +1,4 @@
+import { workplace } from "./workplace.ts";
 import { roomSearch } from "./room-search.ts";
 import { roomBookings } from "./room-bookings.ts";
 import { bookingView } from "./booking-view.ts";
@@ -214,6 +215,7 @@ app.get("/api/state", async (req, res) => {
     ).rows[0].count,
   });
 });
+app.use("/api/workplace", workplace);
 app.use("/api", roomSearch(expireBookings));
 app.use("/api", roomBookings);
 app.use("/api", management);

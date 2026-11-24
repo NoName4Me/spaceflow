@@ -1,6 +1,7 @@
 import type { Page } from "../types";
 
 const paths: Record<Page | "menu" | "close", string> = {
+  workplace: "M3 21V8l6-4v17 M9 21V3l6 3v15 M15 21V9l6 3v9 M2 21h20",
   explore: "M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z",
   schedule:
     "M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z M7 3v4 M17 3v4 M3 11h18 M8 15h2 M14 15h2",

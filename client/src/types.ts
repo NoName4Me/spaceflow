@@ -1,6 +1,7 @@
 import type { z } from "zod";
 import type { elementsSchema } from "../../server/layout-schema";
 export type Page =
+  | "workplace"
   | "explore"
   | "schedule"
   | "mine"
