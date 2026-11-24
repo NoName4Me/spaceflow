@@ -83,6 +83,7 @@ try {
     page.locator(".booking-item").filter({ hasText: "浏览器验收预约" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "退出登录", exact: true }).click();
+  await expect(page.locator("#loginForm")).toBeVisible();
   await login(username);
   await page.getByRole("button", { name: "预订审批", exact: true }).click();
   await page
@@ -102,6 +103,7 @@ try {
   await page.getByRole("button", { name: "预订规则", exact: true }).click();
   await expect(page.locator(`[data-rule="${roomId}"]`)).toHaveValue("admin");
   await page.getByRole("button", { name: "退出登录", exact: true }).click();
+  await expect(page.locator("#loginForm")).toBeVisible();
   await login(username + "-member");
   await page.getByRole("button", { name: "我的预订", exact: true }).click();
   const item = page

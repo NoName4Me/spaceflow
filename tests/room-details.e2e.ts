@@ -143,6 +143,7 @@ try {
       ],
     );
   await page.getByRole("button", { name: "退出登录", exact: true }).click();
+  await expect(page.locator("#loginForm")).toBeVisible();
   await login(viewerId);
   await page.locator(`.room-card[data-room="${roomId}"]`).click();
   await loaded();

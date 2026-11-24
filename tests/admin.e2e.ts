@@ -108,9 +108,11 @@ try {
     await pool.query("SELECT id FROM rooms WHERE data->>'code'=$1", [roomCode])
   ).rows[0].id;
   await page.getByRole("button", { name: "退出登录", exact: true }).click();
+  await expect(page.locator("#loginForm")).toBeVisible();
   await login("member-" + tag);
   await expect(page.locator(`[data-room="${roomId}"]`)).toHaveCount(0);
   await page.getByRole("button", { name: "退出登录", exact: true }).click();
+  await expect(page.locator("#loginForm")).toBeVisible();
   await login(username);
   await expect(page.locator(`[data-room="${roomId}"]`)).toBeVisible();
   await page.locator(`[data-room="${roomId}"]`).click();
