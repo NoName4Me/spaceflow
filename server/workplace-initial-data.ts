@@ -156,7 +156,9 @@ export async function seedWorkplace(c:PoolClient,force=false){
    bookings++;
   }
  }
- // No queued emails from initialization; retain in-app notifications and all real outbox records.
+ // Flush deferred booking notifications before clearing initialization-only email jobs.
+ await c.query("SET CONSTRAINTS booking_notification IMMEDIATE");
+ // Retain in-app notifications and all real outbox records.
  await c.query("DELETE FROM email_outbox e USING notifications n WHERE e.notification_id=n.id AND n.booking_id IN (SELECT id FROM bookings WHERE room_id=ANY($1::text[]))",[rooms.map(r=>r.id)]);
  await c.query("INSERT INTO seed_profiles(key) VALUES($1)",[profile]);
  return {status:"created" as const,campuses:campuses.length,buildings:campuses.reduce((n,c)=>n+c.buildings.length,0),floors:floorRows.length,desks:floorRows.reduce((n,f)=>n+f.objects.filter(o=>o.kind==="desk").length,0),staff:staff.length,rooms:rooms.length,bookings};
