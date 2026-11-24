@@ -60,3 +60,10 @@ label.app-label:has(input[type=checkbox]),label.app-label:has(input[type=radio])
 .sf-workplace [data-slot="card"]{box-shadow:none}
 .sf-report[data-slot="card"]{gap:10px;padding:14px}
 @media(prefers-reduced-motion:reduce){[data-slot="dialog-content"],[data-slot="dialog-overlay"]{animation:none!important;transition:none!important}}
+
+/* Keep responsive visibility and sticky-table layout independent of primitive styling. */
+@media(min-width:961px){[data-slot="button"].navigation-toggle,[data-slot="button"].navigation-close{display:none}}
+@media(max-width:960px){[data-slot="button"].navigation-toggle,[data-slot="button"].navigation-close{display:inline-flex;width:44px;height:44px;border:0}}
+.room-management-table td,.room-management-table th{white-space:normal;overflow-wrap:anywhere}
+.room-management-table td small{white-space:normal;overflow-wrap:anywhere}
+.sf-dialog-card,.sf-dialog-detail,.sf-dialog-overlay{animation:none!important;transition:none!important;opacity:1}
