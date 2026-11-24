@@ -93,3 +93,39 @@ planning.get("/floors/:id/versions/:revision",async(req,res)=>{
  const id=z.uuid().parse(req.params.id),rev=z.coerce.number().int().positive().parse(req.params.revision);
  const row=(await pool.query("SELECT objects,reference_image FROM floor_scene_versions WHERE floor_id=$1 AND revision=$2",[id,rev])).rows[0];if(!row)throw fail(404,"版本不存在");res.json({objects:row.objects,referenceImage:row.reference_image});
 });
+
+planning.get("/assignments",async(_req,res)=>{
+ const rows=(await pool.query(`SELECT o->>'userId' AS user_id,o->>'id' AS desk_id,o->>'name' AS desk_name,f.id AS floor_id,f.name AS floor_name,b.name AS building_name
+ FROM floor_scenes s JOIN floors f ON f.id=s.floor_id JOIN buildings b ON b.id=f.building_id
+ CROSS JOIN LATERAL jsonb_array_elements(s.objects) o JOIN users u ON u.id::text=o->>'userId' AND u.active WHERE o->>'kind'='desk' ORDER BY b.name,f.sort_order,o->>'name'`)).rows;
+ res.json(rows);
+});
+planning.post("/transfers",async(req,res)=>{
+ const b=z.object({floorId:z.uuid(),revision:z.number().int().positive(),moves:z.array(z.object({deskId:z.uuid(),userId:z.uuid().nullable()})).min(1).max(200)}).strict().parse(req.body);
+ if(new Set(b.moves.map(m=>m.deskId)).size!==b.moves.length)throw fail(400,"目标工位重复");
+ const users=b.moves.flatMap(m=>m.userId?[m.userId]:[]);
+ if(new Set(users).size!==users.length)throw fail(400,"人员重复");
+ const result=await transaction(async c=>{
+ await lockFloor(c,b.floorId);
+ const rows=(await c.query("SELECT floor_id,revision,objects,reference_image FROM floor_scenes WHERE floor_id=$1 OR EXISTS(SELECT 1 FROM jsonb_array_elements(objects) o WHERE o->>'userId'=ANY($2::text[])) ORDER BY floor_id FOR UPDATE",[b.floorId,users])).rows as {floor_id:string;revision:number;objects:SpatialObject[];reference_image:string|null}[];
+ const dest=rows.find(r=>r.floor_id===b.floorId);if(!dest||dest.revision!==b.revision)throw fail(409,"目标楼层已更新，请刷新");
+ if((await c.query("SELECT 1 FROM floor_scene_drafts WHERE floor_id=ANY($1::uuid[]) LIMIT 1",[rows.map(r=>r.floor_id)])).rowCount)throw fail(409,"涉及楼层存在未发布草稿，请先发布或删除草稿");
+ if(users.length!==(await c.query("SELECT id FROM users WHERE active AND id=ANY($1::uuid[]) FOR SHARE",[users])).rowCount)throw fail(400,"员工不存在或已停用");
+ const active=new Set((await c.query("SELECT id FROM users WHERE active")).rows.map(r=>r.id));
+ const targets=new Map(b.moves.map(m=>[m.deskId,m.userId]));
+ for(const m of b.moves){const desk=dest.objects.find(o=>o.id===m.deskId&&o.kind==="desk");if(!desk)throw fail(400,"目标工位不存在");if(m.userId&&desk.userId&&active.has(desk.userId)&&desk.userId!==m.userId&&!users.includes(desk.userId))throw fail(409,"目标工位已分配，请先释放");}
+ let changes=0;
+ for(const row of rows){
+ const next=row.objects.map(o=>{
+ if(row.floor_id===b.floorId&&targets.has(o.id))return {...o,userId:targets.get(o.id)||undefined};
+ if(o.userId&&users.includes(o.userId))return {...o,userId:undefined};
+ return o;
+ });
+ if(JSON.stringify(next)===JSON.stringify(row.objects))continue;
+ sceneSchema.parse({revision:row.revision,objects:next});
+ await snapshot(c,row.floor_id,row.revision+1,next,row.reference_image,req.user.id);
+ await c.query("INSERT INTO audit(actor,action,target) VALUES($1,'floor.desk.transferred',$2)",[req.user.id,row.floor_id]);changes++;
+ }
+ return {floors:changes};
+ });res.json(result);
+});

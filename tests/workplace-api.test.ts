@@ -61,3 +61,27 @@ test("drafts are isolated, revision guarded, published search and history work",
  const summary=(await req("/workplace/planning/summary",member)).data.find((x:any)=>x.floor_id===floorId);
  assert.equal(summary.desks,1);assert.equal(summary.assigned,1);assert.equal(summary.rooms,0);
 });
+
+test("cross-floor transfer is atomic and refuses a pending draft",async()=>{
+ const other=randomUUID(),desk=randomUUID(),path="/workplace/planning/floors/"+other;
+ await pool.query("INSERT INTO floors(id,building_id,name) VALUES($1,$2,'2F')",[other,buildingId]);
+ try{
+ const body={baseRevision:0,draftRevision:0,objects:[{id:desk,kind:"desk",name:"Target",x:4,y:4,w:4,h:3,rotation:0}],referenceImage:null};
+ assert.equal((await req(path+"/draft",admin,"PUT",body)).status,200);
+ assert.equal((await req(path+"/publish",admin,"POST",{draftRevision:1})).status,200);
+ const move={floorId:other,revision:1,moves:[{deskId:desk,userId:memberId}]};
+ assert.equal((await req("/workplace/planning/transfers",member,"POST",move)).status,403);
+ const source="/workplace/planning/floors/"+floorId;
+ const current=(await req(source+"/draft",admin)).data;
+ assert.equal((await req(source+"/draft",admin,"PUT",{baseRevision:current.baseRevision,draftRevision:0,objects:current.objects,referenceImage:null})).status,200);
+ assert.equal((await req("/workplace/planning/transfers",admin,"POST",move)).status,409);
+ assert.equal((await req(source+"/draft",admin,"DELETE",{draftRevision:1})).status,200);
+ const moved=await req("/workplace/planning/transfers",admin,"POST",move);
+ assert.equal(moved.status,200);assert.equal(moved.data.floors,2);
+ assert.equal((await req("/workplace/floors/"+other,member)).data.objects[0].userId,memberId);
+ assert.ok(!(await req("/workplace/floors/"+floorId,member)).data.objects.some((o:any)=>o.userId===memberId));
+ assert.equal((await req("/workplace/planning/transfers",admin,"POST",move)).status,409);
+ assert.equal((await req("/workplace/planning/transfers",admin,"POST",{...move,revision:2,moves:[{deskId:desk,userId:null}]})).status,200);
+ assert.equal((await req("/workplace/floors/"+other,member)).data.objects[0].userId,undefined);
+ }finally{await pool.query("DELETE FROM floors WHERE id=$1",[other]);}
+});

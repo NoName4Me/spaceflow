@@ -23,6 +23,7 @@ try{
  await page.getByRole("button",{name:"编辑布局",exact:true}).click();
  await page.getByRole("button",{name:"＋ 区域",exact:true}).click();
  await page.getByLabel("所属部门",{exact:true}).selectOption(department);
+ await page.getByLabel("宽度",{exact:true}).fill("40");
  await page.getByRole("button",{name:"生成工位阵列",exact:true}).click();
  await page.getByRole("button",{name:"撤销",exact:true}).click();
  await page.getByRole("button",{name:"重做",exact:true}).click();
