@@ -1,3 +1,4 @@
+import { Badge } from "../components/ui/badge";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../components/ui/table";
 import { AppButton, AppInput, AppTextarea, AppLabel } from "../components/primitives";
 import { Fragment, useState, type ReactNode } from "react";
@@ -680,7 +681,7 @@ export function Rooms() {
                     </TableCell>
                     <TableCell>{r.equip.join("、") || "—"}</TableCell>
                     <TableCell>{ruleLabels[r.rule]}</TableCell>
-                    <TableCell>{roomStatusLabels[r.status]}</TableCell>
+                    <TableCell><Badge variant="outline" className="room-status-badge">{roomStatusLabels[r.status]}</Badge></TableCell>
                     <TableCell>
                       <AppButton
                         className="button small"

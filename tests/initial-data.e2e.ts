@@ -33,7 +33,9 @@ const browser=await chromium.launch({headless:true,...(process.env.CI?{}:{channe
 try{
  const page=await browser.newPage({viewport:{width:1440,height:1000}});await page.goto(base);
  await page.getByLabel("账号",{exact:true}).fill("member");await page.getByLabel("密码",{exact:true}).fill(password);await page.getByRole("button",{name:"登录",exact:true}).click();
+ await expect(page.locator("[data-slot=button]")).not.toHaveCount(0);
  await page.getByRole("button",{name:"办公空间",exact:true}).click();
+ await expect(page.locator("[data-slot=native-select]").first()).toBeVisible();
  await expect(page.locator(".sf-scene canvas")).toBeVisible();
  await mkdir("test-results",{recursive:true});await page.screenshot({path:"test-results/workplace-initial-campus.png"});
  await page.getByRole("button",{name:"我的工位",exact:true}).click();await expect(page.locator(".sf-properties")).toContainText("林同事");

@@ -47,3 +47,16 @@ label.app-label:has(input[type=checkbox]),label.app-label:has(input[type=radio])
 .sf-workplace .sf-layers .button{min-height:32px}
 .sf-workplace .sf-heading small{letter-spacing:.06em}
 @media(max-width:650px){.sf-dialog-card,.sf-dialog-detail{max-width:calc(100vw - 20px);max-height:calc(100dvh - 20px);padding:16px}.topbar{height:56px}.header-right{gap:6px}.sf-workplace .sf-panel{padding:12px}}
+
+/* Data presentation: use table slots for consistent density and readable columns. */
+[data-slot="table"]{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+[data-slot="table-container"]{max-width:100%}
+[data-slot="table-head"]{background:var(--surface-subtle);color:var(--muted);font-weight:500;font-size:12px}
+[data-slot="table-row"]:not(:last-child){border-bottom:1px solid var(--line)}
+[data-slot="table-cell"]{font-size:13px}
+[data-slot="table-body"] [data-slot="table-row"]:hover{background:var(--surface-hover)}
+.room-status-badge{color:var(--ink);border-color:var(--line-strong);font-weight:500}
+.sf-workplace [data-slot="badge"]{border-radius:5px}
+.sf-workplace [data-slot="card"]{box-shadow:none}
+.sf-report[data-slot="card"]{gap:10px;padding:14px}
+@media(prefers-reduced-motion:reduce){[data-slot="dialog-content"],[data-slot="dialog-overlay"]{animation:none!important;transition:none!important}}
