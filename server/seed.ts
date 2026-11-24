@@ -1,3 +1,4 @@
+import { seedWorkplace } from "./workplace-initial-data.ts";
 import { resolveTemplate } from "./template-choice.ts";
 import { resolveLocation } from "./locations.ts";
 import { readFile, writeFile } from "node:fs/promises";
@@ -18,6 +19,8 @@ vm.runInContext(
   context,
 );
 const credentials: string[] = [];
+const profile=process.env.SPACEFLOW_SEED_PROFILE||"workplace";
+const force=process.argv.includes("--workplace");
 try {
   await transaction(async (c) => {
     for (const [username, name, role] of [
@@ -30,7 +33,7 @@ try {
       )
         continue;
       const password = randomBytes(12).toString("base64url");
-      await c.query("INSERT INTO users VALUES($1,$2,$3,$4,$5)", [
+      await c.query("INSERT INTO users(id,username,name,password_hash,role) VALUES($1,$2,$3,$4,$5)", [
         randomUUID(),
         username,
         name,
@@ -38,6 +41,11 @@ try {
         role,
       ]);
       credentials.push(`${username}: ${password}`);
+    }
+    if(profile!=="minimal"||force){
+      const result=await seedWorkplace(c,force);
+      console.log("Workplace initialization:",result);
+      return;
     }
     for (const r of context.seedRooms) {
       if ((await c.query("SELECT id FROM rooms WHERE id=$1", [r.id])).rowCount)
@@ -68,7 +76,7 @@ try {
       credentials.join("\n") + "\n",
       { mode: 0o600 },
     );
-  console.log("Rooms and accounts ready. Credentials: .local-accounts");
+  console.log("Initial data and accounts ready. Credentials: .local-accounts");
 } finally {
   await pool.end();
 }

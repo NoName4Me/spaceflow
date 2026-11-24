@@ -197,6 +197,7 @@ try {
   await expect(page.locator("#loginForm")).toBeVisible();
   await login(username, "Updated-browser-password-123");
   await page.getByRole("button", { name: "退出登录", exact: true }).click();
+  await expect(page.locator("#loginForm")).toBeVisible();
   await login("admin-" + tag);
   await nav("操作记录");
   await expect(
