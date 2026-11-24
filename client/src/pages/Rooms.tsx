@@ -1,3 +1,5 @@
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../components/ui/table";
+import { AppButton, AppInput, AppTextarea, AppLabel } from "../components/primitives";
 import { Fragment, useState, type ReactNode } from "react";
 import { json } from "../api";
 import { CheckAll, Field, Select, Tools } from "../components/ui";
@@ -118,32 +120,32 @@ function RoomFields({
         defaultValue={r?.equip.join("，") || ""}
       />
       <div className="field full-row">
-        <label htmlFor="edit-desc">介绍</label>
-        <textarea
+        <AppLabel htmlFor="edit-desc">介绍</AppLabel>
+        <AppTextarea
           id="edit-desc"
           name="desc"
           maxLength={2000}
           defaultValue={r?.desc || ""}
         />
       </div>
-      <label className="checkbox-row full-row">
-        <input
+      <AppLabel className="checkbox-row full-row">
+        <AppInput
           name="repeat"
           type="checkbox"
           defaultChecked={r?.repeat || false}
         />
         允许周期预订
-      </label>
+      </AppLabel>
       <details className="full-row access-fields">
         <summary>可见与预订权限</summary>
-        <label className="checkbox-row">
-          <input
+        <AppLabel className="checkbox-row">
+          <AppInput
             type="checkbox"
             name="viewRestricted"
             defaultChecked={a.viewRestricted}
           />
           仅指定部门或人员可见
-        </label>
+        </AppLabel>
         {(["viewDepartments", "viewUsers"] as const).map((k) => (
           <Select
             key={k}
@@ -154,14 +156,14 @@ function RoomFields({
             multiple
           />
         ))}
-        <label className="checkbox-row">
-          <input
+        <AppLabel className="checkbox-row">
+          <AppInput
             type="checkbox"
             name="bookRestricted"
             defaultChecked={a.bookRestricted}
           />
           仅指定部门或人员可预订
-        </label>
+        </AppLabel>
         {(
           [
             "bookDepartments",
@@ -321,8 +323,8 @@ function BulkFields({
     <>
       {fields.map(([key, label, input]) => (
         <div className="bulk-field full-row" key={key}>
-          <label className="checkbox-row">
-            <input
+          <AppLabel className="checkbox-row">
+            <AppInput
               type="checkbox"
               name={"apply-" + key}
               checked={enabled.includes(key)}
@@ -335,7 +337,7 @@ function BulkFields({
               }
             />
             {label}
-          </label>
+          </AppLabel>
           <div>{input(!enabled.includes(key))}</div>
         </div>
       ))}
@@ -405,7 +407,7 @@ export function Rooms() {
             required
           />
           {id && (
-            <button
+            <AppButton
               className="button"
               type="button"
               onClick={() =>
@@ -418,7 +420,7 @@ export function Rooms() {
               }
             >
               删除空{label}
-            </button>
+            </AppButton>
           )}
         </>
       ),
@@ -518,23 +520,23 @@ export function Rooms() {
   return (
     <section className="page" aria-busy={catalogLoading || directoryLoading}>
       <Tools>
-        <button
+        <AppButton
           className="button"
           id="newBuilding"
           disabled={catalogLoading}
           onClick={() => editLocation("buildings")}
         >
           ＋ 楼栋
-        </button>
-        <button
+        </AppButton>
+        <AppButton
           className="button"
           id="newFloor"
           disabled={catalogLoading || !catalog.buildings.length}
           onClick={() => editLocation("floors")}
         >
           ＋ 楼层
-        </button>
-        <button
+        </AppButton>
+        <AppButton
           className="button primary"
           id="newRoom"
           disabled={
@@ -543,55 +545,55 @@ export function Rooms() {
           onClick={() => editRoom()}
         >
           ＋ 新增会议室
-        </button>
+        </AppButton>
       </Tools>
       <div className="catalog-layout">
         <aside className="panel location-tree">
-          <button
+          <AppButton
             className={`tree-item ${!building ? "selected" : ""}`}
             data-location-all
             onClick={() => location()}
           >
             全部会议室
-          </button>
+          </AppButton>
           {catalog.buildings.map((b) => (
             <Fragment key={b.id}>
               <div className="tree-line">
-                <button
+                <AppButton
                   className={`tree-item ${building === b.id && !floor ? "selected" : ""}`}
                   data-location-building={b.id}
                   onClick={() => location(b.id)}
                 >
                   {b.name}
-                </button>
-                <button
+                </AppButton>
+                <AppButton
                   className="icon-btn"
                   aria-label={"编辑" + b.name}
                   data-edit-building={b.id}
                   onClick={() => editLocation("buildings", b.id)}
                 >
                   ⋯
-                </button>
+                </AppButton>
               </div>
               {catalog.floors
                 .filter((f) => f.building_id === b.id)
                 .map((f) => (
                   <div className="tree-line tree-floor" key={f.id}>
-                    <button
+                    <AppButton
                       className={`tree-item ${floor === f.id ? "selected" : ""}`}
                       data-location-floor={f.id}
                       onClick={() => location(b.id, f.id)}
                     >
                       {f.name}
-                    </button>
-                    <button
+                    </AppButton>
+                    <AppButton
                       className="icon-btn"
                       aria-label={"编辑" + b.name + f.name}
                       data-edit-floor={f.id}
                       onClick={() => editLocation("floors", f.id)}
                     >
                       ⋯
-                    </button>
+                    </AppButton>
                   </div>
                 ))}
             </Fragment>
@@ -602,25 +604,25 @@ export function Rooms() {
             <span>
               {count ? `已选 ${count} 间` : `${rows.length} 间会议室`}
             </span>
-            <button
+            <AppButton
               className="button"
               id="bulkRooms"
               disabled={!count}
               onClick={bulk}
             >
               批量编辑
-            </button>
+            </AppButton>
           </div>
           <div className="table-scroll">
-            <table className="room-management-table">
+            <Table className="room-management-table">
               <colgroup>
                 {[5, 22, 8, 8, 13, 15, 12, 9, 8].map((width, i) => (
                   <col key={i} style={{ width: width + "%" }} />
                 ))}
               </colgroup>
-              <thead>
-                <tr>
-                  <th>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>
                     <CheckAll
                       checked={!!rows.length && count === rows.length}
                       mixed={count > 0 && count < rows.length}
@@ -628,7 +630,7 @@ export function Rooms() {
                         setSelected(checked ? rows.map((r) => r.id) : [])
                       }
                     />
-                  </th>
+                  </TableHead>
                   {[
                     "会议室",
                     "容量",
@@ -638,18 +640,18 @@ export function Rooms() {
                     "预订方式",
                     "状态",
                   ].map((s) => (
-                    <th key={s}>{s}</th>
+                    <TableHead key={s}>{s}</TableHead>
                   ))}
-                  <th>
+                  <TableHead>
                     <span className="sr-only">操作</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {rows.map((r) => (
-                  <tr className="management-row" key={r.id}>
-                    <td>
-                      <input
+                  <TableRow className="management-row" key={r.id}>
+                    <TableCell>
+                      <AppInput
                         type="checkbox"
                         data-select-room={r.id}
                         aria-label={"选择" + r.name}
@@ -662,44 +664,44 @@ export function Rooms() {
                           )
                         }
                       />
-                    </td>
-                    <td>
+                    </TableCell>
+                    <TableCell>
                       <strong>{r.name}</strong>
                       <small>
                         {r.building} / {r.floor} · {r.code}
                       </small>
-                    </td>
-                    <td>{r.capacity} 人</td>
-                    <td>{r.area} ㎡</td>
-                    <td>
+                    </TableCell>
+                    <TableCell>{r.capacity} 人</TableCell>
+                    <TableCell>{r.area} ㎡</TableCell>
+                    <TableCell>
                       {data.layoutTemplates.find(
                         (t) => t.id === r.layoutTemplateId,
                       )?.name || r.type}
-                    </td>
-                    <td>{r.equip.join("、") || "—"}</td>
-                    <td>{ruleLabels[r.rule]}</td>
-                    <td>{roomStatusLabels[r.status]}</td>
-                    <td>
-                      <button
+                    </TableCell>
+                    <TableCell>{r.equip.join("、") || "—"}</TableCell>
+                    <TableCell>{ruleLabels[r.rule]}</TableCell>
+                    <TableCell>{roomStatusLabels[r.status]}</TableCell>
+                    <TableCell>
+                      <AppButton
                         className="button small"
                         data-edit-room={r.id}
                         disabled={directoryLoading}
                         onClick={() => editRoom(r)}
                       >
                         编辑
-                      </button>
-                    </td>
-                  </tr>
+                      </AppButton>
+                    </TableCell>
+                  </TableRow>
                 ))}
                 {!rows.length && (
-                  <tr>
-                    <td colSpan={9} className="empty-box">
+                  <TableRow>
+                    <TableCell colSpan={9} className="empty-box">
                       暂无会议室
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 )}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </div>
       </div>

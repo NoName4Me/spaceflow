@@ -1,3 +1,4 @@
+import { AppButton, AppInput, AppSelect } from "../components/primitives";
 import { Fragment, useRef, useState, type CSSProperties } from "react";
 import { Empty, Tools } from "../components/ui";
 import { overlap } from "../model";
@@ -44,14 +45,14 @@ export function Schedule({
   return (
     <section className="page">
       <Tools>
-        <button
+        <AppButton
           className="button"
           aria-label={`上一${week ? "周" : "日"}`}
           onClick={() => shift(-1)}
         >
           ←
-        </button>
-        <input
+        </AppButton>
+        <AppInput
           className="button"
           aria-label="日程日期"
           id="schedule-date"
@@ -62,14 +63,14 @@ export function Schedule({
               setFilters({ ...filters, date: e.target.value });
           }}
         />
-        <button
+        <AppButton
           className="button"
           aria-label={`下一${week ? "周" : "日"}`}
           onClick={() => shift(1)}
         >
           →
-        </button>
-        <select
+        </AppButton>
+        <AppSelect
           className="button"
           aria-label="日程视图"
           id="schedule-view"
@@ -81,7 +82,7 @@ export function Schedule({
         >
           <option value="day">日视图</option>
           <option value="week">周视图</option>
-        </select>
+        </AppSelect>
       </Tools>
       {!c ? (
         <Empty>正在加载日程</Empty>
@@ -168,7 +169,7 @@ export function Schedule({
                           const editable =
                             b.owner === "me" || data?.user.role === "admin";
                           return (
-                            <button
+                            <AppButton
                               key={b.id}
                               className={`calendar-event ${b.status === "pending" ? "pending" : ""}`}
                               disabled={loading}
@@ -193,17 +194,17 @@ export function Schedule({
                               </span>
                               {b.title}
                               {b.status === "pending" ? " · 待审批" : ""}
-                            </button>
+                            </AppButton>
                           );
                         })}
-                        <button
+                        <AppButton
                           className="calendar-add"
                           disabled={loading || r.canBook === false}
                           aria-label={`预订${r.name} ${date} ${start}`}
                           onClick={() => onBook(r, start, date)}
                         >
                           ＋
-                        </button>
+                        </AppButton>
                       </div>
                     );
                   })}
@@ -212,23 +213,23 @@ export function Schedule({
             </div>
           </div>
           <div className="pagination">
-            <button
+            <AppButton
               className="button"
               disabled={loading || c.page <= 1}
               onClick={() => setPage(c.page - 1)}
             >
               上一页
-            </button>
+            </AppButton>
             <span>
               {c.page} / {c.pages}
             </span>
-            <button
+            <AppButton
               className="button"
               disabled={loading || c.page >= c.pages}
               onClick={() => setPage(c.page + 1)}
             >
               下一页
-            </button>
+            </AppButton>
           </div>
         </>
       )}

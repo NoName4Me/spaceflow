@@ -1,3 +1,5 @@
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../components/ui/table";
+import { AppButton, AppInput, AppLabel } from "../components/primitives";
 import { useState } from "react";
 import { companyDate, dateRange, type BookingPeriod } from "../booking-dates";
 import { statusLabels } from "../model";
@@ -43,8 +45,8 @@ export function RoomBookingList({
       </div>
       <div className="agenda-filters">
         <div className="agenda-date">
-          <label htmlFor="detailDate">日期</label>
-          <input
+          <AppLabel htmlFor="detailDate">日期</AppLabel>
+          <AppInput
             type="date"
             aria-label="预订日期"
             id="detailDate"
@@ -64,7 +66,7 @@ export function RoomBookingList({
           aria-label="预订日期快捷筛选"
         >
           {presets.map(([key, label]) => (
-            <button
+            <AppButton
               key={key}
               className={`agenda-preset ${period === key ? "active" : ""}`}
               aria-pressed={period === key}
@@ -80,7 +82,7 @@ export function RoomBookingList({
               }}
             >
               {label}
-            </button>
+            </AppButton>
           ))}
         </div>
         {range.from !== range.to && (
@@ -90,40 +92,40 @@ export function RoomBookingList({
         )}
       </div>
       <div className="agenda-table-scroll" aria-busy={loading}>
-        <table className="agenda-table">
-          <thead>
-            <tr>
-              <th>使用时间</th>
-              <th>会议主题</th>
-              <th>预订人</th>
-              <th>备注</th>
-              <th>提交时间</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table className="agenda-table">
+          <TableHeader>
+            <TableRow>
+              <TableHead>使用时间</TableHead>
+              <TableHead>会议主题</TableHead>
+              <TableHead>预订人</TableHead>
+              <TableHead>备注</TableHead>
+              <TableHead>提交时间</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {result.bookings.map((b) => (
-              <tr key={b.id} data-booking-record={b.id}>
-                <td className="agenda-time">
+              <TableRow key={b.id} data-booking-record={b.id}>
+                <TableCell className="agenda-time">
                   <time dateTime={`${b.date}T${b.start}:00+08:00`}>
                     {b.date}
                   </time>
                   <strong>
                     {b.start}–{b.end}
                   </strong>
-                </td>
-                <td>
+                </TableCell>
+                <TableCell>
                   <span className="agenda-subject">{b.title}</span>
                   <span
                     className={`agenda-status ${b.status === "pending" ? "pending" : ""}`}
                   >
                     {statusLabels[b.status]}
                   </span>
-                </td>
-                <td>{b.detailsHidden ? "**" : b.ownerName || "—"}</td>
-                <td className="agenda-notes">
+                </TableCell>
+                <TableCell>{b.detailsHidden ? "**" : b.ownerName || "—"}</TableCell>
+                <TableCell className="agenda-notes">
                   {b.detailsHidden ? "**" : b.notes || "—"}
-                </td>
-                <td className="agenda-created">
+                </TableCell>
+                <TableCell className="agenda-created">
                   {b.createdAt ? (
                     <time dateTime={b.createdAt}>
                       {new Date(b.createdAt).toLocaleString("zh-CN", {
@@ -139,38 +141,38 @@ export function RoomBookingList({
                   ) : (
                     "—"
                   )}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
             {!result.bookings.length && (
-              <tr>
-                <td colSpan={5} className="agenda-empty">
+              <TableRow>
+                <TableCell colSpan={5} className="agenda-empty">
                   {loading ? "加载中" : "暂无预订"}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
       {result.pages > 1 && (
         <div className="pagination">
-          <button
+          <AppButton
             className="button small"
             disabled={loading || result.page <= 1}
             onClick={() => setPage(result.page - 1)}
           >
             上一页
-          </button>
+          </AppButton>
           <span>
             {result.page} / {result.pages}
           </span>
-          <button
+          <AppButton
             className="button small"
             disabled={loading || result.page >= result.pages}
             onClick={() => setPage(result.page + 1)}
           >
             下一页
-          </button>
+          </AppButton>
         </div>
       )}
     </section>

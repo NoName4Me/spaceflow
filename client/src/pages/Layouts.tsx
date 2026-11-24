@@ -1,3 +1,4 @@
+import { AppButton, AppInput, AppSelect, AppLabel } from "../components/primitives";
 import {
   useCallback,
   useEffect,
@@ -52,13 +53,13 @@ export function Layouts() {
   ) : (
     <section className="page">
       <Tools>
-        <button
+        <AppButton
           className="button primary"
           id="newLayout"
           onClick={() => start()}
         >
           ＋ 新增布局
-        </button>
+        </AppButton>
       </Tools>
       <div className="layout-library">
         {data.layoutTemplates.map((t) => {
@@ -67,20 +68,20 @@ export function Layouts() {
           ).length;
           return (
             <article className="layout-card" key={t.id}>
-              <button
+              <AppButton
                 className="layout-card-main"
                 data-edit-layout={t.id}
                 onClick={() => start(t)}
               >
                 <Plan elements={t.layout} name={t.name} />
                 <strong>{t.name}</strong>
-              </button>
+              </AppButton>
               <div className="layout-card-footer">
                 <small>{used} 间会议室</small>
-                <button className="linklike" onClick={() => start(t, true)}>
+                <AppButton className="linklike" onClick={() => start(t, true)}>
                   复制
-                </button>
-                <button
+                </AppButton>
+                <AppButton
                   className="linklike"
                   disabled={!!used}
                   onClick={() =>
@@ -94,7 +95,7 @@ export function Layouts() {
                   }
                 >
                   删除
-                </button>
+                </AppButton>
               </div>
             </article>
           );
@@ -345,10 +346,10 @@ function LayoutEditor({
   return (
     <section className="page">
       <div className="layout-edit-toolbar">
-        <button className="button" id="layoutBack" onClick={back}>
+        <AppButton className="button" id="layoutBack" onClick={back}>
           ← 返回
-        </button>
-        <input
+        </AppButton>
+        <AppInput
           className="smallinput"
           ref={nameInput}
           id="managedLayoutName"
@@ -358,7 +359,7 @@ function LayoutEditor({
           placeholder="布局名称"
           maxLength={100}
         />
-        <select
+        <AppSelect
           className="smallinput"
           aria-label="布局类型"
           id="managedLayoutType"
@@ -368,23 +369,23 @@ function LayoutEditor({
           {types.map((t) => (
             <option key={t}>{t}</option>
           ))}
-        </select>
-        <button
+        </AppSelect>
+        <AppButton
           className="button"
           id="undoBtn"
           disabled={!undo.length}
           onClick={undoLast}
         >
           撤销
-        </button>
-        <button
+        </AppButton>
+        <AppButton
           className="button primary"
           id="saveManagedLayout"
           disabled={busy}
           onClick={() => void save()}
         >
           保存布局
-        </button>
+        </AppButton>
       </div>
       <div className="editor-grid">
         <aside className="panel editor-side">
@@ -398,7 +399,7 @@ function LayoutEditor({
               ["board", "白板"],
             ] as const
           ).map(([type, label]) => (
-            <button
+            <AppButton
               className="palette-item"
               key={type}
               data-add={type}
@@ -406,7 +407,7 @@ function LayoutEditor({
             >
               {label}
               <span>＋</span>
-            </button>
+            </AppButton>
           ))}
         </aside>
         <div className="panel layout-canvas-panel">
@@ -430,7 +431,7 @@ function LayoutEditor({
               <div className="mini-fields">
                 {properties.map(([key, label, n, min, max]) => (
                   <div key={selected.id + key}>
-                    <label htmlFor={"prop-" + key}>{label}</label>
+                    <AppLabel htmlFor={"prop-" + key}>{label}</AppLabel>
                     <PropertyInput
                       id={"prop-" + key}
                       value={n}
@@ -442,7 +443,7 @@ function LayoutEditor({
                 ))}
               </div>
               <div className="row-actions">
-                <button
+                <AppButton
                   className="button small"
                   id="rotateEl"
                   onClick={() =>
@@ -454,8 +455,8 @@ function LayoutEditor({
                   }
                 >
                   旋转 90°
-                </button>
-                <button
+                </AppButton>
+                <AppButton
                   className="button small"
                   id="cloneEl"
                   onClick={() => {
@@ -470,32 +471,32 @@ function LayoutEditor({
                   }}
                 >
                   复制
-                </button>
-                <button className="button small" id="deleteEl" onClick={remove}>
+                </AppButton>
+                <AppButton className="button small" id="deleteEl" onClick={remove}>
                   删除
-                </button>
+                </AppButton>
               </div>
             </>
           ) : (
             <p className="property-hint">未选中组件</p>
           )}
-          <label className="checkbox-row">
-            <input
+          <AppLabel className="checkbox-row">
+            <AppInput
               type="checkbox"
               id="snapGrid"
               checked={snap}
               onChange={(e) => setSnap(e.target.checked)}
             />
             网格吸附
-          </label>
-          <button
+          </AppLabel>
+          <AppButton
             className="button wide"
             id="importLayout"
             onClick={() => file.current?.click()}
           >
             导入 JSON
-          </button>
-          <input
+          </AppButton>
+          <AppInput
             ref={file}
             type="file"
             id="layoutFile"
@@ -535,7 +536,7 @@ function LayoutEditor({
               }
             }}
           />
-          <button
+          <AppButton
             className="button wide"
             id="exportLayout"
             onClick={() => {
@@ -563,10 +564,10 @@ function LayoutEditor({
             }}
           >
             导出 JSON
-          </button>
+          </AppButton>
           {versions.length > 0 && (
             <>
-              <select
+              <AppSelect
                 className="smallinput"
                 id="managedLayoutVersion"
                 aria-label="布局历史版本"
@@ -578,8 +579,8 @@ function LayoutEditor({
                     版本 {v.version}
                   </option>
                 ))}
-              </select>
-              <button
+              </AppSelect>
+              <AppButton
                 className="button wide"
                 id="restoreManagedLayout"
                 onClick={async () => {
@@ -597,7 +598,7 @@ function LayoutEditor({
                 }}
               >
                 载入历史版本
-              </button>
+              </AppButton>
             </>
           )}
         </aside>
@@ -622,7 +623,7 @@ function PropertyInput({
   const [text, setText] = useState(String(value));
   useEffect(() => setText(String(value)), [value]);
   return (
-    <input
+    <AppInput
       className="smallinput"
       id={id}
       type="number"
