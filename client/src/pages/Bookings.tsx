@@ -1,3 +1,4 @@
+import { AppButton, AppInput, AppTextarea, AppLabel } from "../components/primitives";
 import { useCallback, useRef, useState } from "react";
 import {
   RoomSuggestions,
@@ -7,7 +8,7 @@ import { ApiError, json, message } from "../api";
 import { statusLabels, today, value } from "../model";
 import { useWorkspace } from "../workspace";
 import { Field, Select, Empty, Tools } from "../components/ui";
-import { useDialogFocus } from "../components/useDialogFocus";
+import { DialogTitle } from "../components/ui/dialog";
 import type { Booking, Directory, Room } from "../types";
 export type BookRoom = (
   room: Room,
@@ -102,8 +103,8 @@ export function useBookingActions() {
             required
           />
           <div className="field full-row">
-            <label htmlFor="edit-notes">备注</label>
-            <textarea
+            <AppLabel htmlFor="edit-notes">备注</AppLabel>
+            <AppTextarea
               id="edit-notes"
               name="notes"
               maxLength={2000}
@@ -121,10 +122,10 @@ export function useBookingActions() {
               value="single"
             />
           )}
-          <label className="checkbox-row full-row">
-            <input type="checkbox" name="hidden" defaultChecked={b.hidden} />
+          <AppLabel className="checkbox-row full-row">
+            <AppInput type="checkbox" name="hidden" defaultChecked={b.hidden} />
             隐藏预订详情
-          </label>
+          </AppLabel>
         </>
       ),
       save: async (f) => {
@@ -169,8 +170,6 @@ export function BookingForm({
     null,
   );
   const reviewed = useRef({ dates: [] as string[], window: "" });
-  const ref = useRef<HTMLDivElement>(null);
-  useDialogFocus(ref, close);
   const r = selectedRoom,
     first = draft.start || filters.start,
     end =
@@ -180,17 +179,17 @@ export function BookingForm({
         : filters.end);
   if (!data) return null;
   return (
-    <div ref={ref}>
+    <div>
       <div className="modal-top">
-        <h2 id="modalTitle">预订会议室</h2>
-        <button
+        <DialogTitle id="modalTitle">预订会议室</DialogTitle>
+        <AppButton
           className="icon-btn"
           id="closeModal"
           aria-label="关闭"
           onClick={close}
         >
           ×
-        </button>
+        </AppButton>
       </div>
       <div id="modalBody">
         <form
@@ -307,8 +306,8 @@ export function BookingForm({
         >
           <div className="form-grid">
             <div className="field full-row">
-              <label htmlFor="booking-room">会议室</label>
-              <input
+              <AppLabel htmlFor="booking-room">会议室</AppLabel>
+              <AppInput
                 id="booking-room"
                 value={`${r.name} · ${r.code}`}
                 disabled
@@ -438,13 +437,13 @@ export function BookingForm({
               </>
             )}
             <div className="field full-row">
-              <label htmlFor="book-notes">备注</label>
-              <textarea id="book-notes" name="notes" maxLength={2000} />
+              <AppLabel htmlFor="book-notes">备注</AppLabel>
+              <AppTextarea id="book-notes" name="notes" maxLength={2000} />
             </div>
-            <label className="checkbox-row full-row">
-              <input name="hidden" type="checkbox" />
+            <AppLabel className="checkbox-row full-row">
+              <AppInput name="hidden" type="checkbox" />
               隐藏预订详情
-            </label>
+            </AppLabel>
             <div
               id="bookingError"
               className="full-row alert"
@@ -470,32 +469,32 @@ export function BookingForm({
                 />
               </div>
             )}
-            <label
+            <AppLabel
               className="checkbox-row full-row"
               id="skipConflictRow"
               hidden={!conflicts.length}
             >
-              <input
+              <AppInput
                 id="skipConflicts"
                 type="checkbox"
                 checked={skip}
                 onChange={(e) => setSkip(e.target.checked)}
               />
               仅提交无冲突日期
-            </label>
+            </AppLabel>
           </div>
           <div className="form-foot">
-            <button
+            <AppButton
               className="button"
               type="button"
               id="cancelModal"
               onClick={close}
             >
               取消
-            </button>
-            <button className="button primary" type="submit" disabled={busy}>
+            </AppButton>
+            <AppButton className="button primary" type="submit" disabled={busy}>
               {r.rule === "approval" ? "提交审批" : "确认预订"}
-            </button>
+            </AppButton>
           </div>
         </form>
       </div>
@@ -540,12 +539,12 @@ export function Bookings({
     <section className="page">
       {mode === "mine" && (
         <Tools>
-          <button
+          <AppButton
             className="button primary"
             onClick={() => navigate("explore")}
           >
             ＋ 创建新预订
-          </button>
+          </AppButton>
         </Tools>
       )}
       <div className="panel booking-list">
@@ -576,36 +575,36 @@ export function Bookings({
             <div className="row-actions">
               {mode === "approvals" ? (
                 <>
-                  <button
+                  <AppButton
                     className="button"
                     disabled={busy === b.id}
                     onClick={() => void act(b, "reject")}
                   >
                     拒绝
-                  </button>
-                  <button
+                  </AppButton>
+                  <AppButton
                     className="button primary"
                     disabled={busy === b.id}
                     onClick={() => void act(b, "approve")}
                   >
                     通过
-                  </button>
+                  </AppButton>
                   {b.seriesId && (
                     <>
-                      <button
+                      <AppButton
                         className="button small"
                         disabled={busy === b.id}
                         onClick={() => void act(b, "approve", true)}
                       >
                         通过后续
-                      </button>
-                      <button
+                      </AppButton>
+                      <AppButton
                         className="button small"
                         disabled={busy === b.id}
                         onClick={() => void act(b, "reject", true)}
                       >
                         拒绝后续
-                      </button>
+                      </AppButton>
                     </>
                   )}
                 </>
@@ -613,28 +612,28 @@ export function Bookings({
                 ["pending", "confirmed"].includes(b.status) && (
                   <>
                     {mode === "mine" && (
-                      <button
+                      <AppButton
                         className="button small"
                         onClick={() => onEdit(b)}
                       >
                         修改
-                      </button>
+                      </AppButton>
                     )}
-                    <button
+                    <AppButton
                       className="button small"
                       disabled={busy === b.id}
                       onClick={() => void act(b, "cancel")}
                     >
                       {mode === "mine" && b.seriesId ? "取消本次" : "取消预订"}
-                    </button>
+                    </AppButton>
                     {b.seriesId && (
-                      <button
+                      <AppButton
                         className="button small"
                         disabled={busy === b.id}
                         onClick={() => void act(b, "cancel", true)}
                       >
                         取消所有后续
-                      </button>
+                      </AppButton>
                     )}
                   </>
                 )

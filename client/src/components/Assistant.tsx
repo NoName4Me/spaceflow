@@ -1,3 +1,4 @@
+import { AppButton, AppInput, AppSelect, AppTextarea, AppLabel } from "./primitives";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { json, message } from "../api";
 import { initialFilters } from "../model";
@@ -201,8 +202,8 @@ function Requirements({
         <div className="assistant-fields">
           {has("date") && (
             <div className="field assistant-field-wide">
-              <label htmlFor={`${id}-date`}>日期</label>
-              <input
+              <AppLabel htmlFor={`${id}-date`}>日期</AppLabel>
+              <AppInput
                 id={`${id}-date`}
                 type="date"
                 min={companyDate()}
@@ -214,8 +215,8 @@ function Requirements({
           )}
           {has("start") && (
             <div className="field">
-              <label htmlFor={`${id}-start`}>开始时间</label>
-              <input
+              <AppLabel htmlFor={`${id}-start`}>开始时间</AppLabel>
+              <AppInput
                 id={`${id}-start`}
                 type="time"
                 required
@@ -226,8 +227,8 @@ function Requirements({
           )}
           {has("end") && (
             <div className="field">
-              <label htmlFor={`${id}-end`}>结束时间</label>
-              <input
+              <AppLabel htmlFor={`${id}-end`}>结束时间</AppLabel>
+              <AppInput
                 id={`${id}-end`}
                 type="time"
                 required
@@ -250,7 +251,7 @@ function Requirements({
                 const end = start + duration;
                 const value = `${String(Math.floor(end / 60)).padStart(2, "0")}:${String(end % 60).padStart(2, "0")}`;
                 return (
-                  <button
+                  <AppButton
                     type="button"
                     className={`chip ${draft.end === value ? "on" : ""}`}
                     key={duration}
@@ -259,15 +260,15 @@ function Requirements({
                     onClick={() => selected({ end: value })}
                   >
                     {duration === 30 ? "30 分钟" : `${duration / 60} 小时`}
-                  </button>
+                  </AppButton>
                 );
               })}
             </div>
           )}
           {has("capacity") && (
             <div className="field assistant-field-wide">
-              <label htmlFor={`${id}-capacity`}>人数</label>
-              <input
+              <AppLabel htmlFor={`${id}-capacity`}>人数</AppLabel>
+              <AppInput
                 id={`${id}-capacity`}
                 type="number"
                 min={0}
@@ -280,8 +281,8 @@ function Requirements({
           )}
           {has("building") && (
             <div className="field">
-              <label htmlFor={`${id}-building`}>楼栋</label>
-              <select
+              <AppLabel htmlFor={`${id}-building`}>楼栋</AppLabel>
+              <AppSelect
                 id={`${id}-building`}
                 value={draft.building}
                 onChange={(e) => {
@@ -297,13 +298,13 @@ function Requirements({
                 ].map((b) => (
                   <option key={b}>{b}</option>
                 ))}
-              </select>
+              </AppSelect>
             </div>
           )}
           {has("floor") && (
             <div className="field">
-              <label htmlFor={`${id}-floor`}>楼层</label>
-              <select
+              <AppLabel htmlFor={`${id}-floor`}>楼层</AppLabel>
+              <AppSelect
                 id={`${id}-floor`}
                 value={draft.floor}
                 onChange={(e) => selected({ floor: e.target.value })}
@@ -317,7 +318,7 @@ function Requirements({
                 ].map((f) => (
                   <option key={f}>{f}</option>
                 ))}
-              </select>
+              </AppSelect>
             </div>
           )}
           {has("equip") && (
@@ -329,7 +330,7 @@ function Requirements({
                 aria-label="所需设施"
               >
                 {equipment.map((equip) => (
-                  <button
+                  <AppButton
                     type="button"
                     key={equip}
                     className={`chip ${draft.equip.includes(equip) ? "on" : ""}`}
@@ -343,13 +344,13 @@ function Requirements({
                     }
                   >
                     {equip}
-                  </button>
+                  </AppButton>
                 ))}
               </div>
             </div>
           )}
         </div>
-        <button
+        <AppButton
           className="button primary assistant-confirm"
           disabled={
             busy || ((has("start") || has("end")) && draft.start >= draft.end)
@@ -362,7 +363,7 @@ function Requirements({
               ? "确认要求并查找"
               : "没有其他要求，开始查找"
             : "确认条件并继续"}
-        </button>
+        </AppButton>
       </fieldset>
     </form>
   );
@@ -438,7 +439,7 @@ export function Assistant({
     const onKey = (e: KeyboardEvent) => {
       if (
         e.key === "Escape" &&
-        !document.querySelector(".modal-backdrop.open, dialog[open]")
+        !document.querySelector(".modal-backdrop.open, dialog[open], [data-slot=dialog-content]")
       )
         onClose();
     };
@@ -581,7 +582,7 @@ export function Assistant({
       {open && mobile && (
         <>
           <MobileFocus panel={panel} close={onClose} />
-          <button
+          <AppButton
             className="assistant-scrim"
             aria-label="关闭 AI 助手"
             onClick={onClose}
@@ -609,7 +610,7 @@ export function Assistant({
             </div>
           </div>
           <div className="assistant-header-actions">
-            <button
+            <AppButton
               className="icon-btn"
               title="历史对话"
               aria-label="历史对话"
@@ -617,8 +618,8 @@ export function Assistant({
               onClick={() => setHistoryOpen(!historyOpen)}
             >
               <AssistantIcon kind="history" />
-            </button>
-            <button
+            </AppButton>
+            <AppButton
               className="icon-btn"
               title="新对话"
               aria-label="新对话"
@@ -626,21 +627,21 @@ export function Assistant({
               onClick={createChat}
             >
               <AssistantIcon kind="plus" />
-            </button>
-            <button
+            </AppButton>
+            <AppButton
               className="icon-btn"
               aria-label="收起 AI 助手"
               onClick={onClose}
             >
               <AssistantIcon kind="close" />
-            </button>
+            </AppButton>
           </div>
         </header>
         {historyOpen && (
           <div className="assistant-history">
             <h3>历史对话</h3>
             {store.chats.map((c) => (
-              <button
+              <AppButton
                 key={c.id}
                 disabled={busy}
                 className={c.id === chat.id ? "active" : ""}
@@ -658,7 +659,7 @@ export function Assistant({
                     day: "numeric",
                   })}
                 </small>
-              </button>
+              </AppButton>
             ))}
           </div>
         )}
@@ -678,15 +679,15 @@ export function Assistant({
               <h3>这次会议，怎么安排？</h3>
               <p>告诉我时间、人数和要求，我来找合适的会议室。</p>
               <div className="assistant-starters">
-                <button onClick={() => void send("帮我找一间会议室")}>
+                <AppButton onClick={() => void send("帮我找一间会议室")}>
                   找一间会议室 <span aria-hidden="true">→</span>
-                </button>
-                <button onClick={() => setEditConditions(true)}>
+                </AppButton>
+                <AppButton onClick={() => setEditConditions(true)}>
                   选择时间与设施 <span aria-hidden="true">→</span>
-                </button>
-                <button onClick={() => void send("预订会议室需要审批吗？")}>
+                </AppButton>
+                <AppButton onClick={() => void send("预订会议室需要审批吗？")}>
                   了解预订规则 <span aria-hidden="true">→</span>
-                </button>
+                </AppButton>
               </div>
             </div>
           )}
@@ -742,7 +743,7 @@ export function Assistant({
                 </>
               )}
               {m.failed && index === chat.messages.length - 1 && (
-                <button
+                <AppButton
                   className="linklike assistant-retry"
                   disabled={busy}
                   onClick={() => {
@@ -758,7 +759,7 @@ export function Assistant({
                   }}
                 >
                   重试
-                </button>
+                </AppButton>
               )}
             </div>
           ))}
@@ -789,24 +790,24 @@ export function Assistant({
           )}
         </div>
         <div className="assistant-compose">
-          <button
+          <AppButton
             className={`assistant-adjust ${editConditions ? "active" : ""}`}
             disabled={busy}
             aria-expanded={editConditions}
             onClick={() => setEditConditions(!editConditions)}
           >
             时间、人数与设施
-          </button>
+          </AppButton>
           <form
             onSubmit={(e) => {
               e.preventDefault();
               void send(text);
             }}
           >
-            <label className="sr-only" htmlFor="assistant-input">
+            <AppLabel className="sr-only" htmlFor="assistant-input">
               发给间序助手
-            </label>
-            <textarea
+            </AppLabel>
+            <AppTextarea
               ref={input}
               id="assistant-input"
               value={text}
@@ -826,13 +827,13 @@ export function Assistant({
                 }
               }}
             />
-            <button
+            <AppButton
               className="assistant-send"
               aria-label="发送消息"
               disabled={busy || !text.trim()}
             >
               <AssistantIcon kind="send" />
-            </button>
+            </AppButton>
           </form>
         </div>
       </aside>
@@ -847,7 +848,7 @@ export function AssistantButton({
   onClick: () => void;
 }) {
   return (
-    <button
+    <AppButton
       className={`button small assistant-trigger ${open ? "active" : ""}`}
       onClick={onClick}
       aria-expanded={open}
@@ -855,6 +856,6 @@ export function AssistantButton({
     >
       <AssistantIcon />
       AI 助手
-    </button>
+    </AppButton>
   );
 }

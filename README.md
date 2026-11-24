@@ -28,7 +28,7 @@ npm run deploy:local
 
 ## 技术栈
 
-React 19、TypeScript、Vite、CSS 主题变量与 SVG；后端使用 Express 5、Zod、PostgreSQL，Docker Compose 部署。
+React 19、TypeScript、Vite、Tailwind CSS v4、shadcn/ui（Radix UI 源码组件）、CSS 主题变量与 SVG；后端使用 Express 5、Zod、PostgreSQL，Docker Compose 部署。
 
 ## 文档
 
@@ -38,3 +38,5 @@ React 19、TypeScript、Vite、CSS 主题变量与 SVG；后端使用 Express 5�
 | [架构与数据模型](docs/architecture.md) | 模块、表结构、事务、接口和布局格式 |
 | [运行与开发](docs/development.md) | 配置、开发、容器部署、备份和提交规范 |
 | [验收与测试](docs/acceptance.md) | 检查命令、覆盖范围和人工验收路径 |
+
+基础组件位于 `client/src/components/ui`，新增页面直接使用这些组件；`components/primitives.tsx` 是旧页面迁移兼容层。视觉变量集中在 `theme.css` 与 `shadcn.css`。

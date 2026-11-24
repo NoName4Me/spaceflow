@@ -1,0 +1,49 @@
+/* Migration bridge for existing pages. Shadcn slots are the source of basic control styling. */
+[data-slot="button"].button,[data-slot="button"].icon-btn {
+  min-height:36px; border-radius:7px; font-size:13px; font-weight:500;
+  padding:0 13px; gap:7px; box-shadow:0 1px 2px rgb(0 0 0/.025);
+  transition:background-color .14s,border-color .14s,box-shadow .14s;
+}
+[data-slot="button"].button:not(.primary):not(.ghost):hover,[data-slot="button"].icon-btn:hover{background:var(--surface-hover);border-color:var(--line-strong)}
+[data-slot="button"].button.small{min-height:32px;padding:0 10px;font-size:12px}
+[data-slot="button"].icon-btn{width:34px;height:34px;min-height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+[data-slot="button"].button.primary{background:var(--primary);color:var(--primary-foreground);border-color:var(--primary)}
+[data-slot="button"].button.primary:hover{background:var(--primary-hover)}
+[data-slot="button"].button.ghost{border-color:transparent;box-shadow:none}
+[data-slot="button"].button:focus-visible,[data-slot="input"]:focus-visible,[data-slot="native-select"]:focus-visible,[data-slot="textarea"]:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+[data-slot="input"],[data-slot="native-select"],[data-slot="textarea"]{border:1px solid var(--field-border);background:var(--field-bg);border-radius:7px;font-size:13px;color:var(--ink);min-width:0}
+[data-slot="native-select-wrapper"]{display:inline-flex;max-width:100%;min-width:0;position:relative;vertical-align:middle}
+.field [data-slot="native-select-wrapper"],.sf-panel [data-slot="native-select-wrapper"],.form-grid [data-slot="native-select-wrapper"]{width:100%}
+[data-slot="native-select"]{padding-right:32px!important;appearance:none}
+[data-slot="native-select-icon"]{right:10px;width:15px;height:15px;position:absolute;top:50%;transform:translateY(-50%);pointer-events:none}
+.field [data-slot="input"],.field [data-slot="native-select"]{height:38px;padding-top:0;padding-bottom:0}
+.field label{font-size:12px;letter-spacing:0;font-weight:500;margin-bottom:6px;color:var(--ink)}
+label.app-label{white-space:normal}
+label.app-label:has(input[type=checkbox]),label.app-label:has(input[type=radio]){cursor:pointer}
+.sf-dialog-overlay{backdrop-filter:none;background:rgb(18 27 24/.46)}
+.sf-dialog-card,.sf-dialog-detail{position:fixed;top:50%;left:50%;translate:-50% -50%;z-index:51;display:block;max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);margin:0;border:1px solid var(--line);border-radius:12px;box-shadow:0 16px 50px rgb(15 23 20/.16);background:var(--paper);color:var(--ink);overflow:auto}
+.sf-dialog-card{width:min(540px,calc(100vw - 32px));padding:24px}
+.sf-dialog-detail{width:min(940px,calc(100vw - 32px))}
+.sf-dialog-card .modal-top{margin-bottom:20px;align-items:center}
+.sf-dialog-card [data-slot="dialog-title"],.sf-dialog-detail [data-slot="dialog-title"]{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:0}
+.sf-loading{display:flex;flex-direction:column;align-items:center;gap:12px}
+.sidebar{background:var(--sidebar-bg);padding-top:20px}
+.sidebar .nav-item{border-radius:7px;min-height:36px;padding:9px 12px;font-size:13px}
+.sidebar .nav-item.active{font-weight:600}
+.sidebar-label{font-size:11px;letter-spacing:0;font-weight:500;padding-bottom:8px}
+.topbar{height:56px}
+.page-head h1,.sf-heading h2{font-size:24px;font-weight:600;letter-spacing:-.025em}
+.page-head{margin-bottom:22px}
+.panel,.room-card,.stat,.sf-workbench,.sf-metrics>div{border-radius:10px;box-shadow:none}
+.sf-metrics strong,.stat-value{font-variant-numeric:tabular-nums}
+.sf-workplace .sf-metrics>div{padding:14px 16px}
+.sf-workplace .sf-panel h3{font-weight:600;font-size:13px}
+.sf-workplace .sf-panel .sf-list{padding:8px 10px}
+.sf-workplace .sf-panel .sf-list.active{box-shadow:inset 2px 0 0 var(--primary)}
+.sf-workplace .sf-panel label{font-size:12px}
+.sf-workplace .sf-panel [data-slot="native-select-list"]{width:100%}
+.sf-workplace .sf-search [data-slot="input"]{height:36px}
+.sf-workplace .sf-tools .button{padding:0 8px;font-size:12px}
+.sf-workplace .sf-layers .button{min-height:32px}
+.sf-workplace .sf-heading small{letter-spacing:.06em}
+@media(max-width:650px){.sf-dialog-card,.sf-dialog-detail{max-width:calc(100vw - 20px);max-height:calc(100dvh - 20px);padding:16px}.topbar{height:56px}.header-right{gap:6px}.sf-workplace .sf-panel{padding:12px}}

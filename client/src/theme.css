@@ -1,11 +1,11 @@
 /* Base palette: change these values to recolor the application. */
 :root {
-  --palette-accent: #7058e8;
-  --palette-ink: #202126;
-  --palette-canvas: #f6f7f9;
+  --palette-accent: #345f57;
+  --palette-ink: #232927;
+  --palette-canvas: #f6f7f5;
   --palette-paper: #ffffff;
   /* Status colors remain independent from the brand accent. */
-  --palette-success: #365b92;
+  --palette-success: #35664e;
   --palette-warning: #875211;
 
   /* Purpose tokens: derived shades follow the base palette automatically. */
@@ -42,7 +42,7 @@
   --button-primary-bg: var(--primary);
   --button-primary-hover: var(--primary-hover);
   --button-primary-text: var(--paper);
-  --sidebar-bg: #eef0f4;
+  --sidebar-bg: #f8f9f7;
   --sidebar-text: var(--ink);
   --sidebar-muted: var(--muted);
   --sidebar-hover: color-mix(in srgb, var(--ink) 5%, var(--sidebar-bg));
@@ -51,13 +51,13 @@
   --sidebar-active-text: var(--primary-text);
   --brand-mark: var(--primary);
   --toast-bg: var(--ink);
-  --plan-bg: #f1f3f7;
+  --plan-bg: #edf1ee;
   --plan-grid: var(--line);
   --plan-floor: var(--paper);
   --plan-wall: color-mix(in srgb, var(--ink) 30%, var(--paper));
-  --plan-table: #e4e0f4;
-  --plan-table-border: #918ba8;
-  --plan-chair: #f2f0f8;
+  --plan-table: #dce7e1;
+  --plan-table-border: #889e95;
+  --plan-chair: #f1f5f2;
   --plan-chair-border: color-mix(in srgb, var(--ink) 32%, var(--paper));
   --plan-screen: var(--ink);
   --plan-screen-detail: color-mix(in srgb, var(--ink) 35%, var(--paper));

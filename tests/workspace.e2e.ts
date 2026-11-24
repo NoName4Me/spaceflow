@@ -202,6 +202,7 @@ try {
   await mkdir("test-results", { recursive: true });
   await page.screenshot({ path: "test-results/rooms-bulk-list.png" });
   await page.getByRole("button", { name: "退出登录", exact: true }).click();
+  await expect(page.locator("#loginForm")).toBeVisible();
   await login(memberId);
   if (!(await page.locator("#f-building").isVisible()))
     await page.getByRole("button", { name: "更多筛选", exact: true }).click();
