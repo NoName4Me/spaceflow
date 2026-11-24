@@ -191,6 +191,32 @@ test("接口按实时占用、权限及全部设施筛选，模型仅解析条�
     assert.equal(result.body.filters.capacity, 8);
     assert.deepEqual(result.body.filters.equip, ["白板", "投屏"]);
     assert.equal(result.body.suggestions.length, 2);
+    result = await search({
+      filters: { ...base, equip: [], building: "all" },
+      conversation: [{ role: "user", content: "时间和人数已确认" }],
+      answers: { date, start: "14:00", end: "15:00", capacity: 8 },
+    });
+    assert.equal(
+      result.body.suggestions.length,
+      0,
+      "只确认时间和人数时，不能直接推荐",
+    );
+    assert.equal(result.body.reviewRequirements, true);
+    assert.deepEqual(result.body.fields, ["equip", "building", "floor"]);
+    result = await search({
+      filters: { ...base, equip: [], building: "all" },
+      conversation: [{ role: "user", content: "没有其他要求" }],
+      answers: { equip: [], building: "all", floor: "all" },
+      requirementsReviewed: true,
+    });
+    assert.ok(result.body.suggestions.length > 0, "明确没有其他要求后允许推荐");
+    assert.deepEqual(
+      result.body.filters.equip,
+      [],
+      "没有其他要求时不能添加模型猜测的设施",
+    );
+    assert.equal(result.body.requirementsReviewed, true);
+
     await pool.query(
       "UPDATE rooms SET data=jsonb_set(data,'{status}','\"maintenance\"') WHERE id=ANY($1::text[])",
       [[roomIds[2], roomIds[4]]],

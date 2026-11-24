@@ -19,12 +19,14 @@ interface ChatMessage {
   failed?: boolean;
   confirmed?: boolean;
   answers?: Partial<Filters>;
+  requirementsReviewed?: boolean;
 }
 interface Chat {
   id: string;
   title: string;
   filters: Filters;
   messages: ChatMessage[];
+  requirementsReviewed?: boolean;
   updatedAt: number;
 }
 interface ChatStore {
@@ -45,6 +47,7 @@ const newChat = (): Chat => ({
   title: "新对话",
   filters: { ...initialFilters(), date: companyDate() },
   messages: [],
+  requirementsReviewed: false,
   updatedAt: Date.now(),
 });
 function readChats(key: string): ChatStore {
@@ -141,11 +144,13 @@ function Requirements({
   filters,
   fields,
   busy,
+  review = false,
   onConfirm,
 }: {
   filters: Filters;
   fields: AssistantField[];
   busy: boolean;
+  review?: boolean;
   onConfirm: (answers: Partial<Filters>) => void;
 }) {
   const { data } = useWorkspace();
@@ -350,7 +355,13 @@ function Requirements({
             busy || ((has("start") || has("end")) && draft.start >= draft.end)
           }
         >
-          确认条件并继续
+          {review
+            ? draft.equip.length ||
+              draft.building !== "all" ||
+              draft.floor !== "all"
+              ? "确认要求并查找"
+              : "没有其他要求，开始查找"
+            : "确认条件并继续"}
         </button>
       </fieldset>
     </form>
@@ -443,7 +454,11 @@ export function Assistant({
       else log.current.scrollTop = log.current.scrollHeight;
     }
   }, [open, chat.id, chat.messages.length, busy, editConditions]);
-  async function send(content: string, answers?: Partial<Filters>) {
+  async function send(
+    content: string,
+    answers?: Partial<Filters>,
+    reviewed = false,
+  ) {
     if (busy || !content.trim()) return;
     const chatId = chat.id;
     const userMessage: ChatMessage = {
@@ -451,6 +466,7 @@ export function Assistant({
       role: "user",
       content,
       answers,
+      requirementsReviewed: reviewed,
     };
     const messages = [...chat.messages, userMessage];
     const current = new AbortController();
@@ -458,6 +474,7 @@ export function Assistant({
     updateChat(chatId, (c) => ({
       ...c,
       filters: { ...c.filters, ...answers },
+      requirementsReviewed: c.requirementsReviewed || reviewed,
       title: c.messages.length ? c.title : content.slice(0, 24),
       messages: c.messages
         .map((m) => (m.result?.question ? { ...m, confirmed: true } : m))
@@ -509,6 +526,7 @@ export function Assistant({
         ...json({
           filters: chat.filters,
           conversation,
+          requirementsReviewed: Boolean(chat.requirementsReviewed || reviewed),
           ...(answers ? { answers } : {}),
         }),
         signal: current.signal,
@@ -517,6 +535,7 @@ export function Assistant({
       updateChat(chatId, (c) => ({
         ...c,
         filters: result.filters,
+        requirementsReviewed: result.requirementsReviewed,
         messages: [
           ...c.messages,
           {
@@ -708,8 +727,15 @@ export function Assistant({
                             : ["date", "start", "end", "capacity", "equip"]
                         }
                         busy={busy}
+                        review={m.result.reviewRequirements}
                         onConfirm={(answers) =>
-                          void send(summary(answers), answers)
+                          void send(
+                            (m.result!.reviewRequirements
+                              ? "其他要求已确认："
+                              : "") + summary(answers),
+                            answers,
+                            Boolean(m.result!.reviewRequirements),
+                          )
                         }
                       />
                     )}
@@ -723,7 +749,12 @@ export function Assistant({
                     const previous = chat.messages
                       .slice(0, index)
                       .findLast((item) => item.role === "user");
-                    if (previous) void send(previous.content, previous.answers);
+                    if (previous)
+                      void send(
+                        previous.content,
+                        previous.answers,
+                        previous.requirementsReviewed,
+                      );
                   }}
                 >
                   重试
@@ -739,7 +770,14 @@ export function Assistant({
                 filters={chat.filters}
                 fields={allFields}
                 busy={busy}
-                onConfirm={(answers) => void send(summary(answers), answers)}
+                review
+                onConfirm={(answers) =>
+                  void send(
+                    "其他要求已确认：" + summary(answers),
+                    answers,
+                    true,
+                  )
+                }
               />
             </div>
           )}

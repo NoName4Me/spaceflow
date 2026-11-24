@@ -45,9 +45,9 @@ const model = createServer(async (req, res) => {
       capacity: null,
       equip: [],
       action: "ask",
-      question: "会议安排在哪天？选好时间、人数和设施后一起确认。",
+      question: "会议安排在哪天？先确认时间和人数。",
       reply: "",
-      fields: ["date", "start", "end", "capacity", "equip"],
+      fields: ["date", "start", "end", "capacity"],
     };
   } else {
     result = {
@@ -66,13 +66,18 @@ const model = createServer(async (req, res) => {
 });
 function assertAnswers(answers: any) {
   if (
-    answers.date !== date ||
-    answers.start !== "14:00" ||
-    answers.end !== "15:30" ||
-    !answers.equip.includes("白板") ||
-    !answers.equip.includes("投屏")
+    answers.date !== undefined &&
+    (answers.date !== date ||
+      answers.start !== "14:00" ||
+      answers.end !== "15:30" ||
+      answers.capacity !== 8)
   )
-    throw Error("组件批量确认不完整");
+    throw Error("时间人数确认不完整");
+  if (
+    answers.equip !== undefined &&
+    (!answers.equip.includes("白板") || !answers.equip.includes("投屏"))
+  )
+    throw Error("其他要求确认不完整");
 }
 await new Promise<void>((r) => model.listen(0, "127.0.0.1", r));
 const modelAddress = model.address();
@@ -119,21 +124,30 @@ try {
   const form = page.locator(".assistant-requirements");
   await expect(form.getByLabel("人数", { exact: true })).toHaveValue("0");
   await form.getByLabel("人数", { exact: true }).fill("8");
-  await expect(
-    form.getByRole("button", { name: "白板", exact: true }),
-  ).toHaveAttribute("aria-pressed", "false");
-  await form.getByRole("button", { name: "白板", exact: true }).click();
   await form.getByLabel("日期", { exact: true }).fill(date);
   await form.getByLabel("开始时间", { exact: true }).fill("14:00");
   await form.getByRole("button", { name: "1.5 小时", exact: true }).click();
-  await form.getByRole("button", { name: "投屏", exact: true }).click();
   if (Number(requests.length) !== 1) throw Error("选择过程中不应发送模型请求");
   await mkdir("test-results/assistant", { recursive: true });
   await page.screenshot({ path: "test-results/assistant/controls.png" });
   await page.getByRole("button", { name: "确认条件并继续" }).click();
+  await expect(
+    page.getByText("对设施或位置还有其他要求吗？", { exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".assistant-room-card")).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "没有其他要求，开始查找", exact: true }),
+  ).toBeVisible();
+  const requirements = page.locator(".assistant-requirements");
+  await requirements.getByRole("button", { name: "白板", exact: true }).click();
+  await requirements.getByRole("button", { name: "投屏", exact: true }).click();
+  if (Number(requests.length) !== 2) throw Error("选择其他要求时不应提前查询");
+  await page
+    .getByRole("button", { name: "确认要求并查找", exact: true })
+    .click();
   await expect(page.locator(".assistant-room-card").first()).toBeVisible();
   if (
-    Number(requests.length) !== 2 ||
+    Number(requests.length) !== 3 ||
     !requests[1].messages.some((m: any) => m.role === "assistant")
   )
     throw Error("缺少多轮对话上下文");
@@ -189,7 +203,7 @@ try {
   await expect(cards.first()).toBeVisible();
   if (errors.length) throw Error(errors.join("\n"));
   console.log(
-    "通过：连续对话、条件批量确认、严格设施匹配、跨页面及刷新保留历史、手机抽屉、预订带入。",
+    "通过：确认时间人数后先问其他要求；确认白板投屏后才推荐，并保留对话和预订流程。",
   );
 } finally {
   await browser.close();

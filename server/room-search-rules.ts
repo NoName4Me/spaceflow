@@ -33,6 +33,7 @@ export const intentSchema = z
     equip: z.array(name).max(30),
     preferredBuilding: name.nullable(),
     question: z.string().trim().max(300).nullable(),
+    requirementsComplete: z.boolean().optional(),
     action: z.enum(["ask", "search", "reply"]).optional(),
     reply: z.string().trim().max(1200).optional(),
     fields: z.array(assistantFields).max(7).optional(),

@@ -21,6 +21,8 @@ export interface RoomSearchResult {
   question: string | null;
   message: string;
   fields?: AssistantField[];
+  reviewRequirements?: boolean;
+  requirementsReviewed?: boolean;
 }
 export function RoomSuggestions({
   result,

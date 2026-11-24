@@ -29,6 +29,7 @@ const bodySchema = z
       .max(60)
       .optional(),
     answers: searchFiltersSchema.partial().optional(),
+    requirementsReviewed: z.boolean().default(false),
     messages: z
       .array(z.string().trim().min(1).max(1000))
       .min(1)
@@ -40,6 +41,7 @@ async function interpret(
   messages: { role: "user" | "assistant"; content: string }[],
   filters: SearchFilters,
   rooms: any[],
+  requirementsReviewed: boolean,
 ) {
   const key = process.env.AI_API_KEY;
   const model = process.env.AI_MODEL;
@@ -73,8 +75,10 @@ async function interpret(
               role: "system",
               content: `你是间序的会议室预订助手。理解连续对话，用简洁自然的中文回应。只返回 JSON；房间推荐由后端查询，你不能虚构房间、空闲情况或执行预订。
 当前时间 ${new Date().toLocaleString("sv-SE", { timeZone: "Asia/Shanghai" })}，时区 Asia/Shanghai。下周按周一至周日计算。
-输出全部字段：date(YYYY-MM-DD或null),start(HH:mm或null),end(HH:mm或null),capacity(人数或null),building(硬性楼栋或null),floor(硬性楼层或null),equip(所有必须设施的字符串数组),preferredBuilding(优先而非必须的楼栋或null),question(需要补充条件时的问题，否则null),action(ask/search/reply),reply(本轮中文回应),fields(需要用户选择的字段数组，可选date/start/end/capacity/equip/building/floor)。
+输出全部字段：date(YYYY-MM-DD或null),start(HH:mm或null),end(HH:mm或null),capacity(人数或null),building(硬性楼栋或null),floor(硬性楼层或null),equip(所有必须设施的字符串数组),preferredBuilding(优先而非必须的楼栋或null),question(需要补充条件时的问题，否则null),action(ask/search/reply),reply(本轮中文回应),fields(需要用户选择的字段数组，可选date/start/end/capacity/equip/building/floor),requirementsComplete(仅当用户明确表示要求已说全或没有其他要求时为true，否则false)。
 action=ask时，可一次请求多个相关条件，fields驱动界面控件，不要要求用户重复打字；缺少日期或时间时可一起询问date/start/end，缺人数或设施时可一起询问capacity/equip。question说明需要补充什么。已明确的条件也必须输出到对应字段供表单预填。
+推荐前必须确认有没有其他要求。时间和人数齐全不等于需求完整：还没确认其他要求时，询问设施和位置要求，返回action=ask、fields=["equip","building","floor"]。不能把“未提及设施”当作“设施不限”。用户通过组件统一确认，或明确说“没有其他要求”“就这些”后，才可搜索。用户只补充一项设施，不等于已确认没有其他要求。
+其他要求是否已确认：${requirementsReviewed ? "已确认，不要重复问同一个问题" : "尚未确认，推荐前先询问"}。
 action=search表示条件明确，可以查询房间；fields=[]、question=null，reply简短说明按哪些条件查找，不得说已成功预订。
 action=reply用于问候、解释预订规则或其他无需查房的交流；fields=[]、question=null，不要在用户只是问候时直接查房。对话应围绕会议室预订，范围以外简洁回应并引回找房。
 产品规则：同一天、未来一年内；直接预订或管理员审批取决于各房间的规则，待审批也占用时段。真正预订必须由用户在预订表单确认，不声称已预订、改期或取消。你目前只支持找房和解释预订规则，不宣称能操作账号或管理数据。
@@ -130,6 +134,7 @@ export function roomSearch(expireBookings: () => Promise<void>) {
     });
     let preferredBuilding: string | null = null;
     let reply = "";
+    let requirementsReviewed = body.requirementsReviewed;
     if (body.messages || body.conversation) {
       const conversation =
         body.conversation ||
@@ -139,7 +144,13 @@ export function roomSearch(expireBookings: () => Promise<void>) {
           role: "user",
           content: `我通过组件确认了以下条件，请以此为准继续处理：${JSON.stringify(body.answers)}`,
         });
-      const intent = await interpret(conversation, filters, rooms);
+      const intent = await interpret(
+        conversation,
+        filters,
+        rooms,
+        requirementsReviewed,
+      );
+      requirementsReviewed ||= intent.requirementsComplete === true;
       reply = intent.reply || "";
       if (intent.action === "reply") {
         res.json({
@@ -149,6 +160,7 @@ export function roomSearch(expireBookings: () => Promise<void>) {
           message:
             reply || "告诉我会议时间、人数和设施要求，我来帮你找会议室。",
           fields: [],
+          requirementsReviewed,
         });
         return;
       }
@@ -157,18 +169,37 @@ export function roomSearch(expireBookings: () => Promise<void>) {
         body.answers ? { ...intent, ...filters } : intent,
       );
       if (merged.question || intent.action === "ask") {
+        const fields = intent.fields?.length
+          ? intent.fields
+          : inferFields(merged.question || reply);
+        const reviewRequirements =
+          !requirementsReviewed && fields.includes("equip");
         res.json({
           filters: merged.filters,
           suggestions: [],
           question: merged.question || reply || "请补充会议需求。",
           message: reply,
-          fields: intent.fields?.length
-            ? intent.fields
-            : inferFields(merged.question || reply),
+          fields: reviewRequirements
+            ? [...new Set([...fields, "building", "floor"])]
+            : fields,
+          reviewRequirements,
+          requirementsReviewed,
         });
         return;
       }
       filters = merged.filters;
+      if (body.conversation && !requirementsReviewed) {
+        res.json({
+          filters,
+          suggestions: [],
+          question: "对设施或位置还有其他要求吗？",
+          message: "",
+          fields: ["equip", "building", "floor"],
+          reviewRequirements: true,
+          requirementsReviewed: false,
+        });
+        return;
+      }
       preferredBuilding = intent.preferredBuilding;
     }
     if (!validSearchWindow(filters))
@@ -230,6 +261,7 @@ export function roomSearch(expireBookings: () => Promise<void>) {
       suggestions,
       question: null,
       fields: [],
+      requirementsReviewed,
       message: suggestions.length
         ? reply || "找到这些符合条件的会议室，你可以选择一间预订。"
         : !matching.length
