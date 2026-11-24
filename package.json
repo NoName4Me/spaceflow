@@ -18,7 +18,8 @@
     "db:verify-backup": "node scripts/backup.mjs --verify",
     "deploy:local": "node scripts/deploy-local.mjs",
     "deploy:https": "node scripts/deploy-local.mjs --https",
-    "verify:setup": "node scripts/verify-setup.mjs"
+    "verify:setup": "node scripts/verify-setup.mjs",
+    "db:seed:workplace": "npm run db:seed -- --workplace"
   },
   "dependencies": {
     "express": "^5.1.0",

@@ -24,10 +24,20 @@ jobs:
       - name: Configure disposable test database
         run: |
           printf '%s\n' 'DATABASE_URL=postgresql://postgres:ci-only-password@127.0.0.1:5432/spaceflow' 'MIGRATION_DATABASE_URL=postgresql://postgres:ci-only-password@127.0.0.1:5432/spaceflow' > .env
-      - run: npm run db:migrate && npm run db:seed
+      - run: npm run db:migrate && SPACEFLOW_SEED_PROFILE=minimal npm run db:seed
       - run: npm run typecheck && npm test && npm run test:prototype
       - run: npx playwright install --with-deps chromium
       - run: npm run test:ui
+      - name: Verify rich initial workplace
+        run: |
+          node --input-type=module -e 'import pg from "pg";const c=new pg.Client({connectionString:"postgresql://postgres:ci-only-password@127.0.0.1:5432/spaceflow"});await c.connect();await c.query("CREATE DATABASE spaceflow_initial");await c.end();'
+          export DATABASE_URL=postgresql://postgres:ci-only-password@127.0.0.1:5432/spaceflow_initial
+          export MIGRATION_DATABASE_URL=$DATABASE_URL
+          export LOCAL_ACCOUNTS_FILE=$PWD/.initial-accounts
+          npm run db:migrate
+          npm run db:seed
+          npm run db:seed
+          node --env-file=.env --import tsx tests/initial-data.e2e.ts
       - uses: actions/upload-artifact@v4
         if: success()
         with:
