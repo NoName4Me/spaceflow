@@ -20,7 +20,7 @@ export function mountScene(host,items,selected,onSelect,cameraState,onCamera){
  box(scene,100,.65,70,0,-.36,0,"#faf9f6");
  for(const item of items){
   const group=new THREE.Group();group.position.set(item.x+item.w/2-50,item.elevation||0,item.y+item.h/2-35);group.rotation.y=-item.rotation*Math.PI/180;scene.add(group);
-  const color=item.id===selected?"#7058e8":item.color, id=item.id,w=item.w,d=item.h;
+  const color=item.id===selected?"#345f57":item.color, id=item.id,w=item.w,d=item.h;
   const height=item.height??(item.kind==="wall"?3:(item.kind==="room"||item.kind==="zone")?.18:item.kind==="plant"?2:item.kind==="door"?.25:1);
   if(item.kind==="desk"){
    box(group,w*.94,.22,d*.72,0,1.2,-d*.1,color,id);

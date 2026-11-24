@@ -1,3 +1,4 @@
+import { AppButton, AppSelect, AppLabel } from "../components/primitives";
 import { useState } from "react";
 import { json, message } from "../api";
 import { Empty, Field, Select, Tools } from "../components/ui";
@@ -131,22 +132,22 @@ export function Users() {
   return (
     <section className="page" aria-busy={loading}>
       <Tools>
-        <button
+        <AppButton
           className="button"
           id="newDepartment"
           disabled={loading}
           onClick={() => editDepartment()}
         >
           ＋ 新增部门
-        </button>
-        <button
+        </AppButton>
+        <AppButton
           className="button primary"
           id="newUser"
           disabled={loading}
           onClick={() => editUser()}
         >
           ＋ 新增账号
-        </button>
+        </AppButton>
       </Tools>
       <div className="panel">
         <div className="panel-title">
@@ -165,14 +166,14 @@ export function Users() {
                 </p>
               </div>
               <div className="row-actions">
-                <button
+                <AppButton
                   className="button small"
                   data-edit-user={u.id}
                   onClick={() => editUser(u)}
                 >
                   编辑
-                </button>
-                <button
+                </AppButton>
+                <AppButton
                   className="button small"
                   onClick={() =>
                     setDialog({
@@ -197,7 +198,7 @@ export function Users() {
                   }
                 >
                   重置密码
-                </button>
+                </AppButton>
               </div>
             </article>
           ))}
@@ -211,12 +212,12 @@ export function Users() {
           {directory.departments.map((d) => (
             <article className="management-row" key={d.id}>
               <span>{d.name}</span>
-              <button
+              <AppButton
                 className="button small"
                 onClick={() => editDepartment(d.id)}
               >
                 重命名
-              </button>
+              </AppButton>
             </article>
           ))}
           {!directory.departments.length && <Empty>暂无部门</Empty>}
@@ -287,9 +288,9 @@ export function Account() {
         <p className="alert" id="passwordError" role="alert" hidden={!error}>
           {error}
         </p>
-        <button className="button primary" type="submit" disabled={busy}>
+        <AppButton className="button primary" type="submit" disabled={busy}>
           修改密码并重新登录
-        </button>
+        </AppButton>
       </form>
       <form
         id="emailForm"
@@ -320,9 +321,9 @@ export function Account() {
           defaultValue={data?.user.email || ""}
           maxLength={254}
         />
-        <button className="button primary" type="submit" disabled={emailBusy}>
+        <AppButton className="button primary" type="submit" disabled={emailBusy}>
           保存通知邮箱
-        </button>
+        </AppButton>
       </form>
     </section>
   );
@@ -385,7 +386,7 @@ export function Notifications() {
   return (
     <section className="page">
       <Tools>
-        <button
+        <AppButton
           className="button"
           onClick={() =>
             void run(async () => {
@@ -395,7 +396,7 @@ export function Notifications() {
           }
         >
           全部标为已读
-        </button>
+        </AppButton>
       </Tools>
       <div className="panel management-list">
         {rows.map((n) => (
@@ -451,8 +452,8 @@ export function Settings() {
               <span>{r.code}</span>
             </div>
             <div className="field">
-              <label htmlFor={"rule-" + r.id}>预订方式</label>
-              <select
+              <AppLabel htmlFor={"rule-" + r.id}>预订方式</AppLabel>
+              <AppSelect
                 id={"rule-" + r.id}
                 data-rule={r.id}
                 value={r.rule}
@@ -466,11 +467,11 @@ export function Settings() {
                     {v}
                   </option>
                 ))}
-              </select>
+              </AppSelect>
             </div>
             <div className="field">
-              <label htmlFor={"status-" + r.id}>开放状态</label>
-              <select
+              <AppLabel htmlFor={"status-" + r.id}>开放状态</AppLabel>
+              <AppSelect
                 id={"status-" + r.id}
                 data-status={r.id}
                 value={r.status}
@@ -484,7 +485,7 @@ export function Settings() {
                     {v}
                   </option>
                 ))}
-              </select>
+              </AppSelect>
             </div>
           </article>
         ))}

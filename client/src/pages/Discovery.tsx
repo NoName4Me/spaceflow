@@ -1,6 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { AppButton, AppInput, AppSelect, AppLabel } from "../components/primitives";
+import { useEffect, useState } from "react";
 import { Plan } from "../components/Plan";
 import { Empty } from "../components/ui";
+import { WorkspaceDialog } from "../components/WorkspaceDialog";
+import { DialogTitle } from "../components/ui/dialog";
 import { companyDate } from "../booking-dates";
 import { RoomBookingList } from "./RoomBookingList";
 import { available, initialFilters } from "../model";
@@ -69,8 +72,8 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
       <div className="filter-surface">
         <div className="filter-grid">
           <div className="field">
-            <label htmlFor="f-date">日期</label>
-            <input
+            <AppLabel htmlFor="f-date">日期</AppLabel>
+            <AppInput
               id="f-date"
               type="date"
               value={f.date}
@@ -80,8 +83,8 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
             />
           </div>
           <div className="field">
-            <label htmlFor="f-capacity">人数</label>
-            <select
+            <AppLabel htmlFor="f-capacity">人数</AppLabel>
+            <AppSelect
               id="f-capacity"
               value={f.capacity}
               onChange={(e) =>
@@ -106,11 +109,11 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
                     {n} 人以上
                   </option>
                 ))}
-            </select>
+            </AppSelect>
           </div>
           <div className="field">
-            <label htmlFor="f-start">开始时间</label>
-            <input
+            <AppLabel htmlFor="f-start">开始时间</AppLabel>
+            <AppInput
               id="f-start"
               type="time"
               value={f.start}
@@ -118,8 +121,8 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
             />
           </div>
           <div className="field">
-            <label htmlFor="f-end">结束时间</label>
-            <input
+            <AppLabel htmlFor="f-end">结束时间</AppLabel>
+            <AppInput
               id="f-end"
               type="time"
               value={f.end}
@@ -128,7 +131,7 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
           </div>
         </div>
         <div className="filter-actions">
-          <button
+          <AppButton
             className={`filter-toggle ${moreFilters ? "active" : ""}`}
             aria-expanded={moreFilters}
             aria-controls="additionalFilters"
@@ -155,14 +158,14 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
             >
               <path d="m6 9 6 6 6-6" />
             </svg>
-          </button>
-          <button
+          </AppButton>
+          <AppButton
             className="linklike"
             id="clearFilters"
             onClick={() => setFilters(initialFilters())}
           >
             重置
-          </button>
+          </AppButton>
         </div>
         <div
           id="additionalFilters"
@@ -172,8 +175,8 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
           <div className="filter-locations">
             {" "}
             <div className="field">
-              <label htmlFor="f-building">楼栋</label>
-              <select
+              <AppLabel htmlFor="f-building">楼栋</AppLabel>
+              <AppSelect
                 id="f-building"
                 value={f.building}
                 onChange={(e) =>
@@ -189,11 +192,11 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
                 ].map((b) => (
                   <option key={b}>{b}</option>
                 ))}
-              </select>
+              </AppSelect>
             </div>
             <div className="field">
-              <label htmlFor="f-floor">楼层</label>
-              <select
+              <AppLabel htmlFor="f-floor">楼层</AppLabel>
+              <AppSelect
                 id="f-floor"
                 value={f.floor}
                 onChange={(e) => setFilters({ ...f, floor: e.target.value })}
@@ -207,13 +210,13 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
                 ].map((f) => (
                   <option key={f}>{f}</option>
                 ))}
-              </select>
+              </AppSelect>
             </div>
           </div>
           <div className="filter-row2">
             {[...new Set(["投屏", "视频会议", "白板", "音响", ...f.equip])].map(
               (e) => (
-                <button
+                <AppButton
                   key={e}
                   className={`chip ${f.equip.includes(e) ? "on" : ""}`}
                   aria-pressed={f.equip.includes(e)}
@@ -227,7 +230,7 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
                   }
                 >
                   {e}
-                </button>
+                </AppButton>
               ),
             )}
           </div>
@@ -242,7 +245,7 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
               ["list", "列表"],
             ] as const
           ).map(([key, label]) => (
-            <button
+            <AppButton
               key={key}
               className={`button small ${view === key ? "active" : ""}`}
               aria-pressed={view === key}
@@ -254,7 +257,7 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
               }}
             >
               {label}
-            </button>
+            </AppButton>
           ))}
         </div>
       </div>
@@ -268,7 +271,7 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
             ))}
           </div>
           {results.map((r) => (
-            <button
+            <AppButton
               className="discovery-list-row"
               data-room={r.id}
               key={r.id}
@@ -296,13 +299,13 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
               >
                 {status(r)}
               </span>
-            </button>
+            </AppButton>
           ))}
         </div>
       ) : (
         <div className="rooms-grid">
           {results.map((r) => (
-            <button
+            <AppButton
               className="room-card"
               data-room={r.id}
               key={r.id}
@@ -336,7 +339,7 @@ export function Discovery({ onDetail }: { onDetail: (id: string) => void }) {
                   <Facilities room={r} />
                 </span>
               </span>
-            </button>
+            </AppButton>
           ))}
         </div>
       )}
@@ -355,46 +358,23 @@ export function RoomDetail({
   const { data, filters } = useWorkspace(),
     preview = useRoomPreview();
   const [bookingDate, setBookingDate] = useState(filters.date);
-  const dialog = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    dialog.current?.showModal();
-    return () => dialog.current?.close();
-  }, []);
   const room = data?.rooms.find((r) => r.id === id);
   useEffect(() => {
     if (!room) close();
   }, [room, close]);
   if (!room || !data) return null;
   return (
-    <dialog
-      ref={dialog}
-      id="roomDialog"
-      className="room-dialog"
-      aria-labelledby="roomDetailTitle"
-      onClose={close}
-      onCancel={close}
-      onClick={(e) => {
-        if (e.target !== e.currentTarget) return;
-        const r = e.currentTarget.getBoundingClientRect();
-        if (
-          e.clientX < r.left ||
-          e.clientX > r.right ||
-          e.clientY < r.top ||
-          e.clientY > r.bottom
-        )
-          close();
-      }}
-    >
+    <WorkspaceDialog open onClose={close} detail>
       <div className="room-dialog-heading">
-        <h2 id="roomDetailTitle">{room.name}</h2>
-        <button
+        <DialogTitle><span id="roomDetailTitle">{room.name}</span></DialogTitle>
+        <AppButton
           className="icon-btn"
           id="closeRoomDetail"
           aria-label="关闭会议室详情"
           onClick={close}
         >
           ×
-        </button>
+        </AppButton>
       </div>
       <div id="roomDetailBody">
         <div className="room-detail-layout">
@@ -423,7 +403,7 @@ export function RoomDetail({
                 }[room.rule]
               }
             </div>
-            <button
+            <AppButton
               className="button primary"
               disabled={room.canBook === false}
               onClick={() => {
@@ -436,7 +416,7 @@ export function RoomDetail({
               }}
             >
               ＋ 预订会议室
-            </button>
+            </AppButton>
           </div>
         </div>
         <RoomBookingList
@@ -445,6 +425,6 @@ export function RoomDetail({
           onDateChange={setBookingDate}
         />
       </div>
-    </dialog>
+    </WorkspaceDialog>
   );
 }

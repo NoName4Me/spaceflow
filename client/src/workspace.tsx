@@ -45,13 +45,14 @@ function useWorkspaceState() {
   }, []);
   const request = useCallback(
     async <T,>(path: string, init?: RequestInit): Promise<T> => {
+      const current = session.current;
       try {
         return await api<T>(path, init);
       } catch (error) {
         if (
           error instanceof ApiError &&
           error.status === 401 &&
-          path !== "/login"
+          path !== "/login" && current === session.current && !init?.signal?.aborted
         )
           reset();
         throw error;

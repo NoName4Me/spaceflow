@@ -1,5 +1,5 @@
+import { AppButton, AppInput, AppSelect, AppLabel } from "./primitives";
 import {
-  useCallback,
   useEffect,
   useRef,
   useState,
@@ -7,7 +7,8 @@ import {
   type ReactNode,
 } from "react";
 import { message } from "../api";
-import { useDialogFocus } from "./useDialogFocus";
+import { DialogTitle } from "./ui/dialog";
+import { Skeleton } from "./ui/skeleton";
 import { useWorkspace } from "../workspace";
 export function Field({
   label,
@@ -17,8 +18,8 @@ export function Field({
 }: InputHTMLAttributes<HTMLInputElement> & { label: string; name: string }) {
   return (
     <div className="field">
-      <label htmlFor={id}>{label}</label>
-      <input id={id} name={name} {...props} />
+      <AppLabel htmlFor={id}>{label}</AppLabel>
+      <AppInput id={id} name={name} {...props} />
     </div>
   );
 }
@@ -41,8 +42,8 @@ export function Select({
 }) {
   return (
     <div className="field">
-      <label htmlFor={id}>{label}</label>
-      <select
+      <AppLabel htmlFor={id}>{label}</AppLabel>
+      <AppSelect
         id={id}
         name={name}
         defaultValue={value}
@@ -55,12 +56,12 @@ export function Select({
             {text}
           </option>
         ))}
-      </select>
+      </AppSelect>
     </div>
   );
 }
 export function Empty({ children = "暂无记录" }: { children?: ReactNode }) {
-  return <div className="empty-box">{children}</div>;
+  return <div className="empty-box">{children==="正在加载"?<div role="status" className="sf-loading"><Skeleton className="h-4 w-36"/><Skeleton className="h-4 w-52"/><span className="sr-only">正在加载</span></div>:children}</div>;
 }
 export function Tools({ children }: { children: ReactNode }) {
   return <div className="page-tools">{children}</div>;
@@ -69,22 +70,19 @@ export function EditModal() {
   const { dialog, setDialog, refresh, notify } = useWorkspace();
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
-  const panel = useRef<HTMLDivElement>(null);
-  const close = useCallback(() => setDialog(null), [setDialog]);
-  useDialogFocus(panel, close);
   if (!dialog) return null;
   return (
-    <div ref={panel}>
+    <div>
       <div className="modal-top">
-        <h2 id="modalTitle">{dialog.title}</h2>
-        <button
+        <DialogTitle><span id="modalTitle">{dialog.title}</span></DialogTitle>
+        <AppButton
           className="icon-btn"
           id="closeModal"
           aria-label="关闭"
           onClick={() => setDialog(null)}
         >
           ×
-        </button>
+        </AppButton>
       </div>
       <div id="modalBody">
         <form
@@ -112,17 +110,17 @@ export function EditModal() {
             {error}
           </p>
           <div className="form-foot">
-            <button
+            <AppButton
               className="button"
               type="button"
               id="cancelModal"
               onClick={() => setDialog(null)}
             >
               取消
-            </button>
-            <button className="button primary" type="submit" disabled={busy}>
+            </AppButton>
+            <AppButton className="button primary" type="submit" disabled={busy}>
               保存
-            </button>
+            </AppButton>
           </div>
         </form>
       </div>
@@ -143,7 +141,7 @@ export function CheckAll({
     if (ref.current) ref.current.indeterminate = mixed;
   }, [mixed]);
   return (
-    <input
+    <AppInput
       ref={ref}
       type="checkbox"
       id="roomSelectAll"

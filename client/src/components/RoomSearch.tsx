@@ -1,3 +1,4 @@
+import { AppButton } from "./primitives";
 import { useWorkspace } from "../workspace";
 import { Plan } from "./Plan";
 import type { Filters } from "../types";
@@ -85,14 +86,14 @@ export function RoomSuggestions({
                     {s.rule === "approval" ? "需要审批" : "直接预订"}
                   </small>
                 </div>
-                <button
+                <AppButton
                   type="button"
                   className="button primary small"
                   disabled={room.canBook === false}
                   onClick={() => onChoose(s)}
                 >
                   预订
-                </button>
+                </AppButton>
               </div>
             </article>
           );

@@ -1,3 +1,5 @@
+import { AppButton, AppInput, AppLabel } from "./components/primitives";
+import { WorkspaceDialog } from "./components/WorkspaceDialog";
 import {
   useCallback,
   useEffect,
@@ -91,8 +93,8 @@ function Login() {
         <h1>间序</h1>
         <p className="subtext">登录工作空间</p>
         <div className="field">
-          <label htmlFor="username">账号</label>
-          <input
+          <AppLabel htmlFor="username">账号</AppLabel>
+          <AppInput
             id="username"
             name="username"
             autoComplete="username"
@@ -101,8 +103,8 @@ function Login() {
           />
         </div>
         <div className="field">
-          <label htmlFor="password">密码</label>
-          <input
+          <AppLabel htmlFor="password">密码</AppLabel>
+          <AppInput
             id="password"
             name="password"
             type="password"
@@ -113,9 +115,9 @@ function Login() {
         <p id="loginError" className="alert" role="alert" hidden={!error}>
           {error}
         </p>
-        <button className="button primary wide" type="submit" disabled={busy}>
+        <AppButton className="button primary wide" type="submit" disabled={busy}>
           登录
-        </button>
+        </AppButton>
       </form>
     </div>
   );
@@ -194,7 +196,7 @@ export function App() {
   const admin = data?.user.role === "admin";
   const menu = (items: Page[]) =>
     items.map((key) => (
-      <button
+      <AppButton
         key={key}
         data-page={key}
         className={`nav-item ${page === key ? "active" : ""}`}
@@ -205,7 +207,7 @@ export function App() {
           <NavIcon page={key} />
         </span>{" "}
         {titles[key]}
-      </button>
+      </AppButton>
     ));
   return (
     <>
@@ -219,7 +221,7 @@ export function App() {
             <NavigationFocus panel={navigationPanel} close={closeNavigation} />
           )}
           {navigationOpen && (
-            <button
+            <AppButton
               className="navigation-scrim"
               aria-label="关闭导航"
               onClick={closeNavigation}
@@ -234,13 +236,13 @@ export function App() {
             aria-modal={navigationOpen || undefined}
             aria-label="工作空间导航"
           >
-            <button
+            <AppButton
               className="navigation-close icon-btn"
               aria-label="关闭导航菜单"
               onClick={closeNavigation}
             >
               <NavIcon page="close" />
-            </button>
+            </AppButton>
             <div className="brand">
               <span className="brand-mark">
                 <i />
@@ -272,14 +274,14 @@ export function App() {
                   <small id="userRole">{admin ? "空间管理员" : "员工"}</small>
                 </span>
               </div>
-              <button
+              <AppButton
                 data-page="account"
                 className="button wide"
                 onClick={() => goTo("account")}
               >
                 账号设置
-              </button>
-              <button
+              </AppButton>
+              <AppButton
                 id="logout"
                 className="button wide"
                 onClick={() =>
@@ -290,13 +292,13 @@ export function App() {
                 }
               >
                 退出登录
-              </button>
+              </AppButton>
             </div>
           </aside>
           <main className="main" inert={navigationOpen}>
             <header className="topbar">
               <div className="header-location">
-                <button
+                <AppButton
                   className="navigation-toggle icon-btn"
                   aria-label="打开导航菜单"
                   aria-expanded={navigationOpen}
@@ -304,7 +306,7 @@ export function App() {
                   onClick={() => setNavigationOpen(true)}
                 >
                   <NavIcon page="menu" />
-                </button>
+                </AppButton>
                 <div className="breadcrumbs">
                   <span>间序 / </span>
                   <h1 id="crumb">{titles[page]}</h1>
@@ -318,20 +320,20 @@ export function App() {
                     setAssistantOpen(!assistantOpen);
                   }}
                 />
-                <button
+                <AppButton
                   className="button small"
                   id="notificationButton"
                   onClick={() => navigate("notifications")}
                 >
                   {data.unread ? `通知 (${data.unread})` : "通知"}
-                </button>
-                <button
+                </AppButton>
+                <AppButton
                   className="button small"
                   id="refresh"
                   onClick={() => void run(refresh)}
                 >
                   刷新
-                </button>
+                </AppButton>
               </div>
             </header>
             <div id="content">
@@ -369,27 +371,9 @@ export function App() {
             onClose={closeAssistant}
             onBook={booking.open}
           />
-          <div
-            className={`modal-backdrop ${dialog || booking.booking ? "open" : ""}`}
-            id="modal"
-            aria-hidden={!dialog && !booking.booking}
-            onClick={(e) => {
-              if (e.target === e.currentTarget) closeModal();
-            }}
-          >
-            <div
-              className="modal-card"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="modalTitle"
-            >
-              {dialog ? (
-                <EditModal />
-              ) : booking.booking ? (
-                <BookingForm draft={booking.booking} close={booking.close} />
-              ) : null}
-            </div>
-          </div>
+          <WorkspaceDialog open={!!(dialog||booking.booking)} onClose={closeModal}>
+            {dialog?<EditModal/>:booking.booking?<BookingForm draft={booking.booking} close={booking.close}/>:null}
+          </WorkspaceDialog>
           {detail && (
             <RoomDetail id={detail} close={closeDetail} onBook={booking.open} />
           )}
