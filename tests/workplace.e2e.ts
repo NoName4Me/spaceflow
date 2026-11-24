@@ -22,9 +22,11 @@ try{
  await page.getByLabel("园区",{exact:true}).selectOption(campus);await page.getByLabel("楼栋",{exact:true}).selectOption(building);await page.getByLabel("楼层",{exact:true}).selectOption(floor);
  await page.getByRole("button",{name:"编辑布局",exact:true}).click();
  await page.getByRole("button",{name:"＋ 区域",exact:true}).click();
+ await expect(page.locator(".sf-properties")).toContainText("区域 1");
  await page.getByLabel("所属部门",{exact:true}).selectOption(department);
  await page.getByLabel("宽度",{exact:true}).fill("40");
  await page.getByRole("button",{name:"生成工位阵列",exact:true}).click();
+ await expect(page.getByLabel("选择人员（可多选）",{exact:true})).toBeVisible();
  await page.getByRole("button",{name:"撤销",exact:true}).click();
  await page.getByRole("button",{name:"重做",exact:true}).click();
  await page.getByLabel("选择人员（可多选）",{exact:true}).selectOption(member);

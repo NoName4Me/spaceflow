@@ -1,4 +1,4 @@
-import type { SpatialObject } from "./types";
+import type { SpatialObject } from "../../../server/workplace-schema.js";
 type RoomRef={id:string;name:string};
 export function quickLayout(rooms:RoomRef[],deskCount:number,makeId:()=>string):SpatialObject[]{
  if(!Number.isInteger(deskCount)||deskCount<0||deskCount>96||rooms.length>12)throw Error("快速布局支持 0–96 个工位、最多 12 间会议室");
