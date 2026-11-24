@@ -19,7 +19,12 @@ try{
  await pool.query("INSERT INTO campuses(id,name) VALUES($1,$2)",[campus,"验收园区-"+tag]);await pool.query("INSERT INTO buildings(id,name,campus_id) VALUES($1,$2,$3)",[building,"验收楼栋-"+tag,campus]);await pool.query("INSERT INTO floors(id,building_id,name) VALUES($1,$2,'6F')",[floor,building]);
  await page.goto(base);await page.getByLabel("账号",{exact:true}).fill(admin);await page.getByLabel("密码",{exact:true}).fill(password);await page.getByRole("button",{name:"登录",exact:true}).click();
  await page.getByRole("button",{name:"办公空间",exact:true}).click();
- await page.getByLabel("园区",{exact:true}).selectOption(campus);await page.getByLabel("楼栋",{exact:true}).selectOption(building);await page.getByLabel("楼层",{exact:true}).selectOption(floor);
+ await page.getByLabel("园区",{exact:true}).selectOption(campus);
+ await page.getByRole("button",{name:"编辑园区",exact:true}).click();
+ await page.getByRole("button",{name:"＋ 绿化",exact:true}).click();
+ await page.getByRole("button",{name:"保存园区布局",exact:true}).click();
+ await expect(page.getByRole("button",{name:"编辑园区",exact:true})).toBeVisible();
+ await page.getByLabel("楼栋",{exact:true}).selectOption(building);await page.getByLabel("楼层",{exact:true}).selectOption(floor);
  await page.getByRole("button",{name:"编辑布局",exact:true}).click();
  await page.getByRole("button",{name:"＋ 区域",exact:true}).click();
  await expect(page.locator(".sf-properties")).toContainText("区域 1");
@@ -46,11 +51,14 @@ try{
  await page.getByRole("button",{name:"关闭搜索",exact:true}).click();
  await mkdir("test-results",{recursive:true});await page.screenshot({path:"test-results/workplace-2d.png"});
  await page.getByRole("button",{name:"3D 沙盘",exact:true}).click();
- await expect(page.locator(".sf-scene canvas, .sf-plan")).toBeVisible();
+ await expect(page.locator(".sf-scene canvas")).toBeVisible();
  await page.screenshot({path:"test-results/workplace-3d.png"});
  if(errors.length)throw Error(errors.join("\n"));
  async function assertPublished(count:number){const r=await pool.query("SELECT jsonb_array_length(objects) AS n FROM floor_scenes WHERE floor_id=$1",[floor]);if((r.rows[0]?.n??0)!==count)throw Error("draft leaked into published scene");}
  await assertPublished(25);
+ const memberContext=await browser.newContext({viewport:{width:1440,height:1000}});
+ const employee=await memberContext.newPage();
+ await employee.goto(base);await employee.getByLabel("账号",{exact:true}).fill(member);await employee.getByLabel("密码",{exact:true}).fill(password);await employee.getByRole("button",{name:"登录",exact:true}).click();await employee.getByRole("button",{name:"办公空间",exact:true}).click();await employee.getByRole("button",{name:"我的工位",exact:true}).click();await expect(employee.locator(".sf-properties")).toContainText("空间验收员工");await expect(employee.getByRole("button",{name:"编辑布局",exact:true})).toHaveCount(0);await memberContext.close();
  console.log("Workplace browser: hierarchy, layout, undo, draft, publish, search and 3D entry passed");
 }finally{
  await browser.close();await pool.query("DELETE FROM audit WHERE actor=ANY($1::uuid[])",[[admin,member]]);await pool.query("DELETE FROM floors WHERE id=$1",[floor]);await pool.query("DELETE FROM buildings WHERE id=$1",[building]);await pool.query("DELETE FROM campuses WHERE id=$1",[campus]);await pool.query("DELETE FROM sessions WHERE user_id=ANY($1::uuid[])",[[admin,member]]);await pool.query("DELETE FROM users WHERE id=ANY($1::uuid[])",[[admin,member]]);await pool.query("DELETE FROM departments WHERE id=$1",[department]);await new Promise<void>(r=>server.close(()=>r()));await pool.end();

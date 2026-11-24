@@ -29,6 +29,11 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run test:ui
       - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: workplace-preview
+          path: test-results/workplace-*.png
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: browser-evidence
