@@ -14,13 +14,13 @@ const surnames=["陈","林","王","李","张","刘","周","赵","徐","杨","孙
 const given=["子墨","亦宁","清禾","思远","嘉言","知行","予安","景明","若溪","云舟","明轩","书瑶","舒然","安琪","文博","晓晨","静怡","雨桐","佳悦","泽宇","一诺","宁远","星河","语桐","心怡","嘉宁","可欣","亦凡","明哲","思齐","沐阳","婉清"];
 const campuses=[
  {key:"hq",name:"总部办公园区",buildings:[
- {key:"A",name:"综合办公 A 座",x:8,y:10,w:26,h:24,floors:[{n:1,kind:"lobby",depts:[0,4]},{n:3,kind:"office",depts:[0,4,2,1]},{n:5,kind:"office",depts:[2,3,1,0]},{n:8,kind:"office",depts:[1,3,2,0]},{n:12,kind:"executive",depts:[1,0,3,2]}]},
- {key:"B",name:"科技中心 B 座",x:44,y:8,w:23,h:28,floors:[{n:1,kind:"lobby",depts:[5,6]},{n:3,kind:"research",depts:[5,6,5,7]},{n:6,kind:"research",depts:[6,5,7,6]},{n:9,kind:"office",depts:[5,7,6,5]}]},
- {key:"C",name:"运营中心 C 座",x:72,y:39,w:22,h:23,floors:[{n:1,kind:"lobby",depts:[8,7]},{n:2,kind:"office",depts:[8,7,8,7]},{n:5,kind:"office",depts:[7,8,7,4]}]},
+ {key:"A",name:"综合办公 A 座",x:8,y:10,w:26,h:24,floors:[{n:1,kind:"lobby",depts:[0,4]},{n:2,kind:"office",depts:[0,4,2,1]},{n:3,kind:"office",depts:[2,3,1,0]},{n:4,kind:"office",depts:[1,3,2,0]},{n:5,kind:"executive",depts:[1,0,3,2]}]},
+ {key:"B",name:"科技中心 B 座",x:44,y:8,w:23,h:28,floors:[{n:1,kind:"lobby",depts:[5,6]},{n:2,kind:"research",depts:[5,6,5,7]},{n:3,kind:"research",depts:[6,5,7,6]},{n:4,kind:"office",depts:[5,7,6,5]}]},
+ {key:"C",name:"运营中心 C 座",x:72,y:43,w:22,h:23,floors:[{n:1,kind:"lobby",depts:[8,7]},{n:2,kind:"office",depts:[8,7,8,7]},{n:3,kind:"office",depts:[7,8,7,4]}]},
  ]},
  {key:"innovation",name:"创新协作园区",buildings:[
- {key:"D",name:"创新中心 D 座",x:10,y:10,w:30,h:26,floors:[{n:1,kind:"lobby",depts:[6,9]},{n:2,kind:"research",depts:[6,5,7,6]},{n:4,kind:"office",depts:[6,7,9,5]}]},
- {key:"E",name:"培训中心 E 座",x:58,y:12,w:30,h:22,floors:[{n:1,kind:"training",depts:[9,4]},{n:3,kind:"training",depts:[9,0]}]},
+ {key:"D",name:"创新中心 D 座",x:10,y:10,w:30,h:26,floors:[{n:1,kind:"lobby",depts:[6,9]},{n:2,kind:"research",depts:[6,5,7,6]},{n:3,kind:"office",depts:[6,7,9,5]}]},
+ {key:"E",name:"培训中心 E 座",x:58,y:12,w:30,h:22,floors:[{n:1,kind:"training",depts:[9,4]},{n:2,kind:"training",depts:[9,0]}]},
  ]},
 ] as const;
 type FloorPlan=typeof campuses[number]["buildings"][number]["floors"][number];
@@ -61,7 +61,7 @@ function generateFloor(building:{key:string;name:string},floor:FloorPlan,deptIds
   for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
    const n=++deskNumber,id=stableId(key+"/desk/"+n),occupied=(n+floor.n+z)%5!==0;
    let userId:string|undefined;
-   if(member&&building.key==="A"&&floor.n===3&&n===1){userId=member.id;}
+   if(member&&building.key==="A"&&floor.n===2&&n===1){userId=member.id;}
    else if(occupied){
     const i=staffIndex.value++,dept=departmentId;
     const name=surnames[i%surnames.length]+given[Math.floor(i/surnames.length)%given.length];
@@ -81,7 +81,7 @@ function generateFloor(building:{key:string;name:string},floor:FloorPlan,deptIds
   const id="sf-room-"+building.key.toLowerCase()+"-"+floor.n+"-"+(j+1),code="SF-"+building.key+"-"+String(floor.n).padStart(2,"0")+String(j+1).padStart(2,"0");
   const typeIndex=floor.kind==="training"?3:(floor.n+j)%kinds.length,type=kinds[typeIndex],capacity=typeIndex===3?24:typeIndex===2?10:typeIndex===1?12:6;
   const name=roomNames[(floor.n*3+j+building.key.charCodeAt(0))%roomNames.length]+" · "+building.key+floor.n+"-"+(j+1);
-  const room:SeedRoom={id,code,name,building:building.name,floor:floor.n+"F",type,capacity,equip:typeIndex===3?["投屏","视频会议","白板","音响"]:typeIndex===0?["投屏","白板"]:["投屏","视频会议","白板"],area:capacity*3+12,desc:typeIndex===3?"适合专题培训、分享交流与集中研讨。":"适合团队协作、项目评审和日常沟通。",rule:j===2?"approval":"instant",repeat:j!==0,status:building.key==="C"&&floor.n===5&&j===2?"maintenance":"enabled",color:["#b4c5bb","#c7d2df","#d6c6e2","#d9c7ad"][j]};
+  const room:SeedRoom={id,code,name,building:building.name,floor:floor.n+"F",type,capacity,equip:typeIndex===3?["投屏","视频会议","白板","音响"]:typeIndex===0?["投屏","白板"]:["投屏","视频会议","白板"],area:capacity*3+12,desc:typeIndex===3?"适合专题培训、分享交流与集中研讨。":"适合团队协作、项目评审和日常沟通。",rule:floor.kind==="executive"&&j===0?"admin":j===2?"approval":"instant",repeat:j!==0,status:building.key==="C"&&floor.n===3&&j===2?"maintenance":"enabled",color:["#b4c5bb","#c7d2df","#d6c6e2","#d9c7ad"][j]};
   rooms.push(room);add("room",name,x,y,w,h,{roomId:id});add("wall","会议室隔断",x,y+h,w,.45);add("door","会议室入口",x-1,y+4,.65,3);
  }
  add("facility","电梯 / 楼梯",35,3,2.6,16);add("facility","消防通道",35,51,2.6,16);
@@ -149,10 +149,10 @@ export async function seedWorkplace(c:PoolClient,force=false){
   const slots=[[-12,10,11],[-5,14,15],[-1,9,10],[0,9,10],[0,14,15],[1,10,11],[2,14,15],[5,10,11],[7,15,16]];
   for(const [j,[day,start,end]] of slots.entries()){
    if((i+j)%4===0)continue;
-   const p=bookingStaff[(i*13+j*7)%bookingStaff.length],id=stableId("booking/"+room.id+"/"+j);
+   const p=member&&i%7===0&&j===5?member:bookingStaff[(i*13+j*7)%bookingStaff.length],id=stableId("booking/"+room.id+"/"+j);
    const status=day<0&&j===0&&i%3===0?"cancelled":day>=1&&room.rule==="approval"&&j===5?"pending":day<0&&i%7===0?"rejected":"confirmed";
    await c.query(`INSERT INTO bookings(id,room_id,user_id,title,contact,phone,hidden,start_at,end_at,status,expires_at,created_at)
-    VALUES($1,$2,$3,$4,$5,$6,$7,(((now() AT TIME ZONE 'Asia/Shanghai')::date+$8::int)+make_time($9::int,0,0)) AT TIME ZONE 'Asia/Shanghai',(((now() AT TIME ZONE 'Asia/Shanghai')::date+$8::int)+make_time($10::int,0,0)) AT TIME ZONE 'Asia/Shanghai',$11,CASE WHEN $11='pending' THEN now()+interval '24 hours' ELSE NULL END,now()-interval '2 days')`,[id,room.id,p.id,titles[(i+j)%titles.length],p.name,"分机 "+String(8000+(i*13+j)%1000),(i+j)%13===0,day,start,end,status]);
+    VALUES($1,$2,$3,$4,$5,$6,$7,(((now() AT TIME ZONE 'Asia/Shanghai')::date+$8::int)+make_time($9::int,0,0)) AT TIME ZONE 'Asia/Shanghai',(((now() AT TIME ZONE 'Asia/Shanghai')::date+$8::int)+make_time($10::int,0,0)) AT TIME ZONE 'Asia/Shanghai',$11,CASE WHEN $11='pending' THEN now()+interval '24 hours' ELSE NULL END,now()+(LEAST($8::int-3,-1)*interval '1 day'))`,[id,room.id,p.id,titles[(i+j)%titles.length],p.name,"分机 "+String(8000+(i*13+j)%1000),(i+j)%13===0,day,start,end,status]);
    bookings++;
   }
  }
