@@ -36,3 +36,28 @@ test("workplace authorization, persistence, revision and hidden room filtering",
  const a=await req(path+"/availability?date=2030-01-01&start=09:00&end=10:00",member);
  assert.equal(a.status,200);assert.deepEqual(a.data.rooms,{});
 });
+
+test("drafts are isolated, revision guarded, published search and history work",async()=>{
+ const path="/workplace/planning/floors/"+floorId;
+ const pub=(await req("/workplace/floors/"+floorId,admin)).data;
+ const objects=[...pub.objects,{id:randomUUID(),kind:"zone",name:"Planning zone",x:40,y:10,w:20,h:20,rotation:0,points:[[0,0],[1,0],[.7,1],[0,1]]}];
+ const body={baseRevision:pub.revision,draftRevision:0,objects,referenceImage:null};
+ assert.equal((await req(path+"/draft",member)).status,403);
+ const d=await req(path+"/draft",admin,"PUT",body);
+ assert.equal(d.status,200);assert.equal(d.data.draftRevision,1);
+ assert.equal((await req(path+"/draft",admin,"PUT",body)).status,409);
+ assert.equal((await req("/workplace/floors/"+floorId,member)).data.objects.length,1);
+ assert.equal((await req("/workplace/planning/search?q=Planning",member)).data.length,0);
+ const p=await req(path+"/publish",admin,"POST",{draftRevision:1});
+ assert.equal(p.status,200);assert.equal(p.data.revision,2);
+ assert.equal((await req("/workplace/floors/"+floorId,member)).data.objects.length,2);
+ const search=(await req("/workplace/planning/search?q=Planning",member)).data;
+ assert.equal(search[0].floor_id,floorId);
+ assert.equal((await req("/workplace/planning/search?q=Hidden%20room",member)).data.length,0);
+ const versions=await req(path+"/versions",admin);
+ assert.equal(versions.data.length,2);
+ assert.equal((await req(path+"/versions/1",admin)).data.objects.length,2);
+ assert.equal((await req(path+"/versions/1",member)).status,403);
+ const summary=(await req("/workplace/planning/summary",member)).data.find((x:any)=>x.floor_id===floorId);
+ assert.equal(summary.desks,1);assert.equal(summary.assigned,1);assert.equal(summary.rooms,0);
+});

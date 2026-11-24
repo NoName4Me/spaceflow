@@ -37,7 +37,7 @@ planning.get("/search",async(req,res)=>{
  LEFT JOIN users u ON u.id::text=o->>'userId' AND u.active
  LEFT JOIN departments d ON d.id::text=o->>'departmentId'
  WHERE (o->>'roomId' IS NULL OR r.id IS NOT NULL) AND (strpos(lower(o->>'name'),$1)>0 OR strpos(lower(coalesce(u.name,'')),$1)>0 OR strpos(lower(coalesce(r.data->>'name','')),$1)>0 OR strpos(lower(coalesce(d.name,'')),$1)>0)
- ORDER BY b.name,f.sort_order,o->>'name' LIMIT 200`,[q])).rows;
+ ORDER BY b.name,f.sort_order,o->>'name'`,[q])).rows;
  res.json(result.filter(r=>!r.room||canView(r.room,req.user)).slice(0,50).map(({room,...r})=>({...r,name:room?.name||r.name})));
 });
 planning.get("/summary",async(req,res)=>{
@@ -53,7 +53,11 @@ planning.use((req,_res,next)=>{if(req.user.role!=="admin")throw fail(403,"需要
 planning.get("/floors/:id/draft",async(req,res)=>{
  const id=z.uuid().parse(req.params.id);
  const [draft,pub]=await Promise.all([pool.query("SELECT base_revision,revision,objects,reference_image FROM floor_scene_drafts WHERE floor_id=$1",[id]),pool.query("SELECT revision,objects,reference_image FROM floor_scenes WHERE floor_id=$1",[id])]);
- const d=draft.rows[0],p=pub.rows[0];res.json({baseRevision:d?.base_revision??p?.revision??0,draftRevision:d?.revision??0,objects:d?.objects??p?.objects??[],referenceImage:d?d.reference_image:p?.reference_image??null,publishedRevision:p?.revision??0});
+ const d=draft.rows[0],p=pub.rows[0];const raw:SpatialObject[]=d?.objects??p?.objects??[];
+ const rooms=new Set((await pool.query("SELECT id FROM rooms WHERE floor_id=$1",[id])).rows.map(r=>r.id));
+ const active=new Set((await pool.query("SELECT id FROM users WHERE active")).rows.map(r=>r.id));
+ const objects=raw.map(o=>({...o,roomId:o.roomId&&rooms.has(o.roomId)?o.roomId:undefined,userId:o.userId&&active.has(o.userId)?o.userId:undefined}));
+ res.json({baseRevision:d?.base_revision??p?.revision??0,draftRevision:d?.revision??0,objects,referenceImage:d?d.reference_image:p?.reference_image??null,publishedRevision:p?.revision??0});
 });
 planning.put("/floors/:id/draft",async(req,res)=>{
  const id=z.uuid().parse(req.params.id),b:Draft=draftSchema.parse(req.body);
