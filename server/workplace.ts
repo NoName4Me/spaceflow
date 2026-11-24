@@ -37,7 +37,7 @@ workplace.get("/floors/:id/availability",async(req,res)=>{
 workplace.use((req,_res,next)=>{if(req.user.role!=="admin")throw fail(403,"需要管理员权限");next();});
 workplace.post("/campuses",async(req,res)=>{
  const id=randomUUID(),b=z.object({name}).parse(req.body);
- await transaction(async c=>{await c.query("INSERT INTO campuses VALUES($1,$2)",[id,b.name]);await c.query("INSERT INTO audit(actor,action,target) VALUES($1,'campus.created',$2)",[req.user.id,id]);});
+ await transaction(async c=>{await c.query("INSERT INTO campuses(id,name) VALUES($1,$2)",[id,b.name]);await c.query("INSERT INTO audit(actor,action,target) VALUES($1,'campus.created',$2)",[req.user.id,id]);});
  res.status(201).json({id});
 });
 workplace.put("/campuses/:id",async(req,res)=>{
@@ -45,11 +45,26 @@ workplace.put("/campuses/:id",async(req,res)=>{
  await transaction(async c=>{if(!(await c.query("UPDATE campuses SET name=$1 WHERE id=$2",[b.name,id])).rowCount)throw fail(404,"园区不存在");await c.query("INSERT INTO audit(actor,action,target) VALUES($1,'campus.updated',$2)",[req.user.id,id]);});
  res.json({ok:true});
 });
+const campusObject=z.object({id:z.uuid(),kind:z.enum(["road","garden","parking","plaza"]),name:name,x:z.number().min(0).max(100),y:z.number().min(0).max(70),w:z.number().min(.5).max(100),h:z.number().min(.5).max(70),rotation:z.number().min(-360).max(360)}).strict().refine(o=>o.x+o.w<=100&&o.y+o.h<=70,"对象超出园区");
+workplace.put("/campuses/:id/map",async(req,res)=>{
+ const id=z.uuid().parse(req.params.id),b=z.object({revision:z.number().int().nonnegative(),objects:z.array(campusObject).max(100),buildings:z.array(z.object({id:z.uuid(),x:z.number().min(0).max(100),y:z.number().min(0).max(70),w:z.number().min(3).max(100),h:z.number().min(3).max(70),rotation:z.number().min(-360).max(360)}).refine(o=>o.x+o.w<=100&&o.y+o.h<=70)).max(200)}).strict().parse(req.body);
+ if(new Set(b.objects.map(o=>o.id)).size!==b.objects.length||new Set(b.buildings.map(o=>o.id)).size!==b.buildings.length)throw fail(400,"对象重复");
+ const revision=await transaction(async c=>{
+ const campus=(await c.query("SELECT map_revision FROM campuses WHERE id=$1 FOR UPDATE",[id])).rows[0];if(!campus)throw fail(404,"园区不存在");if(campus.map_revision!==b.revision)throw fail(409,"园区布局已被修改");
+ const rows=(await c.query("SELECT id FROM buildings WHERE campus_id=$1 FOR UPDATE",[id])).rows;if(rows.length!==b.buildings.length||b.buildings.some(x=>!rows.some(r=>r.id===x.id)))throw fail(409,"楼栋归属已变化，请刷新");
+ for(const o of b.buildings)await c.query("UPDATE buildings SET map_x=$1,map_y=$2,map_width=$3,map_depth=$4,map_rotation=$5 WHERE id=$6",[o.x,o.y,o.w,o.h,o.rotation,o.id]);
+ await c.query("UPDATE campuses SET map_objects=$1,map_revision=map_revision+1 WHERE id=$2",[JSON.stringify(b.objects),id]);
+ await c.query("INSERT INTO audit(actor,action,target) VALUES($1,'campus.map.updated',$2)",[req.user.id,id]);return b.revision+1;
+ });res.json({revision});
+});
 workplace.put("/buildings/:id",async(req,res)=>{
  const id=z.uuid().parse(req.params.id),b=z.object({campusId:z.uuid(),x:z.number().min(0).max(85),y:z.number().min(0).max(55)}).parse(req.body);
  await transaction(async c=>{
  if(!(await c.query("SELECT 1 FROM campuses WHERE id=$1",[b.campusId])).rowCount)throw fail(400,"园区不存在");
+ const prev=(await c.query("SELECT campus_id FROM buildings WHERE id=$1",[id])).rows[0];if(!prev)throw fail(404,"楼栋不存在");
+ await c.query("SELECT id FROM campuses WHERE id=ANY($1::uuid[]) ORDER BY id FOR UPDATE",[[prev.campus_id,b.campusId]]);
  if(!(await c.query("UPDATE buildings SET campus_id=$1,map_x=$2,map_y=$3 WHERE id=$4",[b.campusId,b.x,b.y,id])).rowCount)throw fail(404,"楼栋不存在");
+ await c.query("UPDATE campuses SET map_revision=map_revision+1 WHERE id=ANY($1::uuid[])",[[prev.campus_id,b.campusId]]);
  await c.query("INSERT INTO audit(actor,action,target) VALUES($1,'building.placement',$2)",[req.user.id,id]);});
  res.json({ok:true});
 });

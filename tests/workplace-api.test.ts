@@ -85,3 +85,13 @@ test("cross-floor transfer is atomic and refuses a pending draft",async()=>{
  assert.equal((await req("/workplace/floors/"+other,member)).data.objects[0].userId,undefined);
  }finally{await pool.query("DELETE FROM floors WHERE id=$1",[other]);}
 });
+
+test("campus map updates geometry and checks revision",async()=>{
+ const path="/workplace/campuses/"+campusId+"/map",body={revision:0,objects:[{id:randomUUID(),kind:"garden",name:"Garden",x:3,y:3,w:12,h:10,rotation:0}],buildings:[{id:buildingId,x:30,y:20,w:25,h:18,rotation:15}]};
+ assert.equal((await req(path,member,"PUT",body)).status,403);
+ assert.equal((await req(path,admin,"PUT",body)).status,200);
+ assert.equal((await req(path,admin,"PUT",body)).status,409);
+ const c=(await req("/workplace/catalog",member)).data;
+ assert.equal(c.campuses.find((x:any)=>x.id===campusId).map_objects[0].kind,"garden");
+ assert.equal(c.buildings.find((x:any)=>x.id===buildingId).map_width,25);
+});

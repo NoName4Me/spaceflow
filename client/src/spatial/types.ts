@@ -1,7 +1,8 @@
 import type { SpatialObject } from "../../../server/workplace-schema";
 export type { SpatialObject };
-export type Campus={id:string;name:string};
-export type Building={id:string;name:string;campus_id:string;map_x:number|null;map_y:number|null};
+export type CampusObject={id:string;kind:"road"|"garden"|"parking"|"plaza";name:string;x:number;y:number;w:number;h:number;rotation:number};
+export type Campus={id:string;name:string;map_objects:CampusObject[];map_revision:number};
+export type Building={id:string;name:string;campus_id:string;map_x:number|null;map_y:number|null;map_width:number;map_depth:number;map_rotation:number};
 export type Floor={id:string;name:string;building_id:string};
 export type Catalog={campuses:Campus[];buildings:Building[];floors:Floor[]};
 export type Person={id:string;name:string;department_id?:string|null};

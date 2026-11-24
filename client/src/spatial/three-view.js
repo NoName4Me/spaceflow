@@ -34,7 +34,7 @@ export function mountScene(host,items,selected,onSelect){
    label(group,item.name,2.2);
   }else{
    if(item.points)polygon(group,item,color,id);else box(group,w,height,d,0,height/2,0,color,id);
-   if(["building","level","zone"].includes(item.kind))label(group,item.name,height+1.4);
+   if(["building","level","zone","garden","parking","plaza"].includes(item.kind))label(group,item.name,height+1.4);if(item.kind==="garden"){for(let i=0;i<3;i++)box(group,Math.min(2,w/5),1.8,Math.min(2,d/4),(i-1)*w*.25,.9,0,"#8aaf94",id);}
    if(item.kind==="building" && height>4){
     for(let y=3;y<height-.5;y+=3)box(group,w+.08,.1,d+.08,0,y,0,"#c4c9d2",id);
    }
