@@ -73,6 +73,8 @@ before(async () => {
     {
       id: room,
       name: "记录验收",
+      building: "records-" + tag,
+      floor: "1F",
       rule: "instant",
       status: "enabled",
       repeat: true,
@@ -193,11 +195,12 @@ test("room records sort by use date/time descending, paginate and never leak hid
   }
   for (const path of [
     "/state",
-    "/calendar?" + new URLSearchParams({ date: to, view: "day", size: "50" }),
+    "/calendar?" + new URLSearchParams({ date: to, view: "day", size: "50", building: "records-" + tag }),
   ]) {
     const b = (await req(path, viewer)).data.bookings.find(
       (b: { id: string }) => b.id === last,
     );
+    assert.ok(b, "目标会议室预订应出现在响应中");
     for (const key of ["ownerName", "notes", "contact", "phone"])
       assert.equal(b[key], undefined);
   }

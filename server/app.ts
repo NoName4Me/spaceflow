@@ -1,3 +1,4 @@
+import { workplace } from "./workplace.ts";
 import { roomSearch } from "./room-search.ts";
 import { roomBookings } from "./room-bookings.ts";
 import { bookingView } from "./booking-view.ts";
@@ -55,6 +56,7 @@ app.use((_req, res, next) => {
   });
   next();
 });
+app.use("/api/workplace", express.json({ limit: "512kb" }));
 app.use(express.json({ limit: "256kb" }));
 app.use("/api", (req, res, next) => {
   res.set("Cache-Control", "no-store");
@@ -214,6 +216,7 @@ app.get("/api/state", async (req, res) => {
     ).rows[0].count,
   });
 });
+app.use("/api/workplace", workplace);
 app.use("/api", roomSearch(expireBookings));
 app.use("/api", roomBookings);
 app.use("/api", management);

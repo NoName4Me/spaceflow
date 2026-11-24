@@ -1,0 +1,14 @@
+import type { SpatialObject } from "../../../server/workplace-schema";
+export type { SpatialObject };
+export type CampusObject={id:string;kind:"road"|"garden"|"parking"|"plaza";name:string;x:number;y:number;w:number;h:number;rotation:number};
+export type Campus={id:string;name:string;map_objects:CampusObject[];map_revision:number};
+export type Building={id:string;name:string;campus_id:string;map_x:number|null;map_y:number|null;map_width:number;map_depth:number;map_rotation:number};
+export type Floor={id:string;name:string;building_id:string};
+export type Catalog={campuses:Campus[];buildings:Building[];floors:Floor[]};
+export type Person={id:string;name:string;department_id?:string|null};
+export type Department={id:string;name:string};
+export type Draft={baseRevision:number;draftRevision:number;publishedRevision:number;objects:SpatialObject[];referenceImage:string|null};
+export type SearchHit={floor_id:string;floor_name:string;building_id:string;building_name:string;campus_id:string;object_id:string;kind:string;name:string;person?:string;department?:string};
+export type FloorSummary={floor_id:string;floor_name:string;building_id:string;building_name:string;campus_id:string;desks:number;assigned:number;rooms:number};
+export type Scene={floorId:string;revision:number;objects:SpatialObject[];people:Person[];departments:Department[]};
+export type MapItem={id:string;name:string;kind:string;x:number;y:number;w:number;h:number;rotation:number;color:string;height?:number;elevation?:number;points?:[number,number][]};
