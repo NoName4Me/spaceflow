@@ -4,9 +4,10 @@ import type {MapItem} from "./types";
 export function SceneView({items,selected,onSelect,onMove,onMoveStart,onDraw,drawPoints=[],referenceImage,mode}:{items:MapItem[];selected:string;onSelect:(id:string)=>void;onMove?:(id:string,x:number,y:number)=>void;onMoveStart?:()=>void;onDraw?:(x:number,y:number)=>void;drawPoints?:[number,number][];referenceImage?:string|null;mode:"2d"|"3d"}){
  const host=useRef<HTMLDivElement>(null),svg=useRef<SVGSVGElement>(null);
  const select=useRef(onSelect);select.current=onSelect;
+ const camera=useRef<{position:number[];target:number[];zoom:number}|undefined>(undefined);
  const [failed,setFailed]=useState(false);
  const drag=useRef<{id:string;dx:number;dy:number}|null>(null);
- useEffect(()=>{if(mode!=="3d"||!host.current||failed)return;let cancelled=false,dispose:(()=>void)|undefined;const el=host.current;void import("./three-view.js").then(({mountScene})=>{if(!cancelled)dispose=mountScene(el,items,selected,id=>select.current(id));}).catch(()=>{if(!cancelled)setFailed(true);});return()=>{cancelled=true;dispose?.();};},[mode,items,selected,failed]);
+ useEffect(()=>{if(mode!=="3d"||!host.current||failed)return;let cancelled=false,dispose:(()=>void)|undefined;const el=host.current;void import("./three-view.js").then(({mountScene})=>{if(!cancelled)dispose=mountScene(el,items,selected,id=>select.current(id),camera.current,state=>camera.current=state);}).catch(()=>{if(!cancelled)setFailed(true);});return()=>{cancelled=true;dispose?.();};},[mode,items,selected,failed]);
  const point=(e:React.PointerEvent)=>{const node=svg.current;if(!node)return null;const p=node.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const m=node.getScreenCTM();return m?p.matrixTransform(m.inverse()):null;};
  if(mode==="3d"&&!failed)return <div className="sf-scene" ref={host} aria-label="3D 空间地图"/>;
  return <div className="sf-scene sf-plan">{mode==="3d"&&failed&&<span className="sf-note">WebGL 不可用，已切换平面地图</span>}<svg ref={svg} viewBox="0 0 104 74" aria-label="平面地图" onPointerDown={e=>{if(onDraw){const p=point(e);if(p)onDraw(Math.max(0,Math.min(100,p.x-2)),Math.max(0,Math.min(70,p.y-2)));}}} onPointerMove={e=>{const p=point(e),d=drag.current;if(p&&d&&onMove)onMove(d.id,p.x-d.dx,p.y-d.dy);}} onPointerUp={()=>drag.current=null} onPointerCancel={()=>drag.current=null}>

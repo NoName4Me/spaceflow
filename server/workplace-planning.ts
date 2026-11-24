@@ -49,6 +49,12 @@ planning.get("/summary",async(req,res)=>{
  const rooms=(await pool.query("SELECT floor_id,data FROM rooms")).rows;
  res.json(rows.map(r=>({...r,rooms:rooms.filter(x=>x.floor_id===r.floor_id&&canView(x.data,req.user)).length})));
 });
+planning.get("/my-desk",async(req,res)=>{
+ const row=(await pool.query(`SELECT f.id AS floor_id,f.name AS floor_name,b.id AS building_id,b.name AS building_name,b.campus_id,o->>'id' AS object_id,o->>'kind' AS kind,o->>'name' AS name
+ FROM floor_scenes s JOIN floors f ON f.id=s.floor_id JOIN buildings b ON b.id=f.building_id
+ CROSS JOIN LATERAL jsonb_array_elements(s.objects) o WHERE o->>'kind'='desk' AND o->>'userId'=$1 LIMIT 1`,[req.user.id])).rows[0];
+ res.json(row||null);
+});
 planning.use((req,_res,next)=>{if(req.user.role!=="admin")throw fail(403,"需要管理员权限");next();});
 planning.get("/floors/:id/draft",async(req,res)=>{
  const id=z.uuid().parse(req.params.id);

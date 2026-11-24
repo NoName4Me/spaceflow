@@ -1,11 +1,11 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-export function mountScene(host,items,selected,onSelect){
+export function mountScene(host,items,selected,onSelect,cameraState,onCamera){
  const scene=new THREE.Scene();scene.background=new THREE.Color("#edf0f3");
  const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));host.appendChild(renderer.domElement);
  const camera=new THREE.OrthographicCamera(-65,65,46,-46,.1,600);
  camera.position.set(103,118,106);camera.lookAt(0,0,0);
- const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,0,0);controls.minZoom=.55;controls.maxZoom=4;controls.maxPolarAngle=Math.PI/2.05;controls.update();
+ const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,0,0);controls.minZoom=.55;controls.maxZoom=4;controls.maxPolarAngle=Math.PI/2.05;if(cameraState){camera.position.fromArray(cameraState.position);controls.target.fromArray(cameraState.target);camera.zoom=cameraState.zoom;camera.updateProjectionMatrix();}controls.update();
  scene.add(new THREE.HemisphereLight(0xffffff,0xb1b5bd,2.2));
  const light=new THREE.DirectionalLight(0xffffff,2.8);light.position.set(-40,90,65);scene.add(light);
  const geo=new THREE.BoxGeometry(1,1,1), pick=[], materials=new Map(), extraGeos=[], textures=[];
@@ -42,7 +42,7 @@ export function mountScene(host,items,selected,onSelect){
  }
  const render=()=>renderer.render(scene,camera);
  const resize=()=>{const w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight),a=w/h,extent=Math.max(46,62/a,Math.max(0,...items.map(o=>(o.elevation||0)+(o.height||0)))*.8+28);camera.left=-extent*a;camera.right=extent*a;camera.top=extent;camera.bottom=-extent;camera.updateProjectionMatrix();renderer.setSize(w,h);render();};
- const observer=new ResizeObserver(resize);observer.observe(host);controls.addEventListener("change",render);resize();
+ const observer=new ResizeObserver(resize);observer.observe(host);controls.addEventListener("change",()=>{onCamera?.({position:camera.position.toArray(),target:controls.target.toArray(),zoom:camera.zoom});render();});resize();
  let start;const down=e=>{start=[e.clientX,e.clientY]};const up=e=>{if(!start||Math.hypot(e.clientX-start[0],e.clientY-start[1])>5)return;const r=renderer.domElement.getBoundingClientRect();const ray=new THREE.Raycaster();ray.setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1),camera);const hit=ray.intersectObjects(pick,false)[0];if(hit)onSelect(hit.object.userData.id);};
  renderer.domElement.addEventListener("pointerdown",down);renderer.domElement.addEventListener("pointerup",up);
  return ()=>{observer.disconnect();controls.dispose();renderer.domElement.removeEventListener("pointerdown",down);renderer.domElement.removeEventListener("pointerup",up);geo.dispose();scene.traverse(o=>{if(o.isSprite)o.material.dispose();});materials.forEach(m=>m.dispose());extraGeos.forEach(g=>g.dispose());textures.forEach(t=>t.dispose());renderer.dispose();renderer.domElement.remove();};
