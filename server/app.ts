@@ -56,6 +56,7 @@ app.use((_req, res, next) => {
   });
   next();
 });
+app.use("/api/workplace", express.json({ limit: "512kb" }));
 app.use(express.json({ limit: "256kb" }));
 app.use("/api", (req, res, next) => {
   res.set("Cache-Control", "no-store");

@@ -150,6 +150,7 @@ try {
   ).toEqual([]);
   await page.screenshot({ path: "test-results/calendar-week.png" });
   await page.setViewportSize({ width: 375, height: 812 });
+  await page.getByRole("button", {name:"打开导航菜单"}).click();
   await nav("会议室管理");
   await expect(
     page.locator(`[data-location-floor="${floorId}"]`),

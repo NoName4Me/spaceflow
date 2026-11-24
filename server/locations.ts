@@ -118,7 +118,7 @@ locations.delete("/buildings/:id", async (req, res) => {
 locations.delete("/floors/:id", async (req, res) => {
   const id = z.uuid().parse(req.params.id);
   await transaction(async (c) => {
-    if ((await c.query("SELECT 1 FROM floor_scenes WHERE floor_id=$1 AND jsonb_array_length(objects)>0", [id])).rowCount) throw fail(409, "请先清空楼层布局及工位");
+    if ((await c.query("SELECT 1 FROM floor_scenes WHERE floor_id=$1 AND jsonb_array_length(objects)>0 UNION ALL SELECT 1 FROM floor_scene_drafts WHERE floor_id=$1", [id])).rowCount) throw fail(409, "请先清空楼层布局及工位");
     if ((await c.query("SELECT 1 FROM rooms WHERE floor_id=$1", [id])).rowCount)
       throw fail(409, "请先移动所属会议室");
     const r = await c.query("DELETE FROM floors WHERE id=$1", [id]);
