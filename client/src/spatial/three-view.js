@@ -18,7 +18,7 @@ export function mountScene(host,items,selected,onSelect){
  for(const item of items){
   const group=new THREE.Group();group.position.set(item.x+item.w/2-50,item.elevation||0,item.y+item.h/2-35);group.rotation.y=-item.rotation*Math.PI/180;scene.add(group);
   const color=item.id===selected?"#7058e8":item.color, id=item.id,w=item.w,d=item.h;
-  const height=item.height??(item.kind==="wall"?3:item.kind==="room"||item.kind==="zone"?.18:item.kind==="plant"?2:item.kind==="door"?.25:1);
+  const height=item.height??(item.kind==="wall"?3:(item.kind==="room"||item.kind==="zone")?.18:item.kind==="plant"?2:item.kind==="door"?.25:1);
   if(item.kind==="desk"){
    box(group,w*.94,.22,d*.72,0,1.2,-d*.1,color,id);
    for(const x of [-.38,.38])box(group,.18,1.2,d*.65,w*x,.6,-d*.1,"#c5c6c9",id);
@@ -35,7 +35,7 @@ export function mountScene(host,items,selected,onSelect){
   }
  }
  const render=()=>renderer.render(scene,camera);
- const resize=()=>{const w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight),a=w/h;camera.left=-46*a;camera.right=46*a;camera.top=46;camera.bottom=-46;camera.updateProjectionMatrix();renderer.setSize(w,h);render();};
+ const resize=()=>{const w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight),a=w/h,extent=Math.max(46,62/a,Math.max(0,...items.map(o=>(o.elevation||0)+(o.height||0)))*.8+28);camera.left=-extent*a;camera.right=extent*a;camera.top=extent;camera.bottom=-extent;camera.updateProjectionMatrix();renderer.setSize(w,h);render();};
  const observer=new ResizeObserver(resize);observer.observe(host);controls.addEventListener("change",render);resize();
  let start;const down=e=>{start=[e.clientX,e.clientY]};const up=e=>{if(!start||Math.hypot(e.clientX-start[0],e.clientY-start[1])>5)return;const r=renderer.domElement.getBoundingClientRect();const ray=new THREE.Raycaster();ray.setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1),camera);const hit=ray.intersectObjects(pick,false)[0];if(hit)onSelect(hit.object.userData.id);};
  renderer.domElement.addEventListener("pointerdown",down);renderer.domElement.addEventListener("pointerup",up);

@@ -27,7 +27,7 @@ import { useWorkspace } from "./workspace";
 import type { Page } from "./types";
 const titles: Record<Page, string> = {
   workplace: "办公空间",
-  explore: "会议室发现",
+  explore: "空间发现",
   schedule: "预订日程",
   mine: "我的预订",
   rooms: "会议室管理",

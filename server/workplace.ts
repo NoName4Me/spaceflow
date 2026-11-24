@@ -2,7 +2,7 @@ import { Router } from "express";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { pool, transaction } from "./db.ts";
-import { canView } from "./access.ts";
+import { canView, canBook } from "./access.ts";
 import { sceneSchema, type SpatialObject } from "./workplace-schema.ts";
 const fail=(status:number,message:string)=>Object.assign(new Error(message),{status});
 const name=z.string().trim().min(1).max(80);
@@ -18,10 +18,16 @@ workplace.get("/floors/:id",async(req,res)=>{
  const row=(await pool.query("SELECT revision,objects FROM floor_scenes WHERE floor_id=$1",[id])).rows[0]||{revision:0,objects:[]};
  const rooms=(await pool.query("SELECT id,data FROM rooms WHERE floor_id=$1",[id])).rows;
  const visible=new Set(rooms.filter(r=>canView(r.data,req.user)).map(r=>r.id));
- const objects:SpatialObject[]=row.objects.filter((o:SpatialObject)=>!o.roomId||visible.has(o.roomId));
+ const objects:SpatialObject[]=row.objects.flatMap((o:SpatialObject)=>!o.roomId||visible.has(o.roomId)?[o]:req.user.role==="admin"?[{...o,roomId:undefined}]:[]);
  const ids=objects.flatMap(o=>o.userId?[o.userId]:[]);
  const people=(await pool.query("SELECT id,name FROM users WHERE active AND id=ANY($1::uuid[])",[ids])).rows;
  res.json({floorId:id,revision:row.revision,objects,people});
+});
+workplace.get("/floors/:id/availability",async(req,res)=>{
+ const id=z.uuid().parse(req.params.id),q=z.object({date:z.iso.date(),start:z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/),end:z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)}).parse(req.query);
+ if(q.start>=q.end)throw fail(400,"开始时间必须早于结束时间");
+ const rows=(await pool.query(`SELECT r.id,r.data,EXISTS(SELECT 1 FROM bookings b WHERE b.room_id=r.id AND (b.status='confirmed' OR (b.status='pending' AND b.expires_at>now() AND b.start_at>now())) AND b.start_at < (($2::date+$4::time) AT TIME ZONE 'Asia/Shanghai') AND b.end_at > (($2::date+$3::time) AT TIME ZONE 'Asia/Shanghai')) AS occupied, (($2::date+$3::time) AT TIME ZONE 'Asia/Shanghai')>now() AS future FROM rooms r WHERE r.floor_id=$1`,[id,q.date,q.start,q.end])).rows;
+ res.json({rooms:Object.fromEntries(rows.filter(r=>canView(r.data,req.user)).map(r=>[r.id,canBook(r.data,req.user)&&r.future&&!r.occupied]))});
 });
 workplace.use((req,_res,next)=>{if(req.user.role!=="admin")throw fail(403,"需要管理员权限");next();});
 workplace.post("/campuses",async(req,res)=>{
